@@ -120,6 +120,10 @@ class FoodButtonLayOut extends ButtonLayOut {
     }
 }
 
+class ButtonGorpupLayOut extends ButtonLayOut {
+    @Override
+    public VBox buttonCreator() { return new VBox(); }
+}
 public class Star_Grill_UIModel extends Application {
     private static Label foodNumberLabel;
 
