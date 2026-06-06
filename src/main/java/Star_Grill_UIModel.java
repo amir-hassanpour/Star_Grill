@@ -3,6 +3,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -100,7 +102,6 @@ abstract class ButtonLayOut {
 class FoodButtonLayOut extends ButtonLayOut {
     @Override
     public VBox buttonCreator() {
-        VBox vBox = new VBox();
         VBox buttonLayout = new VBox();
         buttonLayout.setSpacing(UIInformation.stageHeight() * 0.015);
 
@@ -120,12 +121,46 @@ class FoodButtonLayOut extends ButtonLayOut {
     }
 }
 
-class ButtonGorpupLayOut extends ButtonLayOut {
-    @Override
-    public VBox buttonCreator() { return new VBox(); }
-}
 public class Star_Grill_UIModel extends Application {
     private static Label foodNumberLabel;
+
+    private static TextField customAmount () {
+        TextField customAmountVBox =  new TextField();
+
+        customAmountVBox.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        customAmountVBox.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        return customAmountVBox;
+    }
+
+    private static VBox orderExtraDetails () {
+        VBox orderExtraDetailsVBox = new VBox();
+
+        Button toGoButton = new Button();
+
+        toGoButton.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        toGoButton.setPrefHeight(UIInformation.stageHeight() * 0.05);
+        toGoButton.setText("To Go");
+
+        TextField extraDetails = new TextField();
+        extraDetails.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        extraDetails.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        orderExtraDetailsVBox.getChildren().addAll(extraDetails, toGoButton);
+
+        return orderExtraDetailsVBox;
+    }
+
+
+    private static VBox orderFinalization() {
+        VBox extraDetail = new VBox();
+        extraDetail.setSpacing(UIInformation.stageHeight() * 0.02);
+
+        extraDetail.getChildren().add(customAmount());
+        extraDetail.getChildren().add(orderExtraDetails());
+
+        return extraDetail;
+    }
 
     public static Label orderNumber(int orderNum) {
         foodNumberLabel = new Label("Food Number: " + orderNum);
@@ -154,6 +189,18 @@ public class Star_Grill_UIModel extends Application {
 
         return buttonNumberVBox;
     }
+
+    private static HBox mainHBoxLayOut () {
+        HBox mainLayOut = new HBox();
+
+        mainLayOut.setSpacing(UIInformation.stageHeight() * 0.03);
+
+        mainLayOut.getChildren().add(buttonNumber());
+        mainLayOut.getChildren().add(orderFinalization());
+
+        return mainLayOut;
+    }
+
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
@@ -161,7 +208,7 @@ public class Star_Grill_UIModel extends Application {
 
         Scene scene = new Scene(root, UIInformation.stageWidth(), UIInformation.stageHeight());
 
-        root.getChildren().add(buttonNumber());
+        root.getChildren().add(mainHBoxLayOut());
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Star Grill");
