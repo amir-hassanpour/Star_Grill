@@ -96,11 +96,11 @@ class UIInformation {
     public static Map<String, Integer> topping() { return TOPPING; }
 }
 
-abstract class ButtonLayOut {
+abstract class ButtonLayout {
     public abstract Node buttonCreator();
 }
 
-class FoodButtonLayOut extends ButtonLayOut {
+class FoodButtonLayout extends ButtonLayout {
     @Override
     public VBox buttonCreator() {
         VBox buttonLayout = new VBox();
@@ -122,7 +122,7 @@ class FoodButtonLayOut extends ButtonLayOut {
     }
 }
 
-class FinalLayOut {
+class FinalLayout {
     private static Label foodNumberLabel;
 
     private static Label orderNumber(int orderNum) {
@@ -139,7 +139,7 @@ class FinalLayOut {
     private static VBox buttonNumber() {
         VBox buttonNumberVBox = new VBox();
 
-        VBox buttonLayout = new FoodButtonLayOut().buttonCreator();
+        VBox buttonLayout = new FoodButtonLayout().buttonCreator();
         buttonNumberVBox.setSpacing(UIInformation.stageHeight() * 0.1);
 
         Label foodNumberLabel = orderNumber(1);
@@ -251,17 +251,17 @@ class FinalLayOut {
         return paymentMethodHBox;
     }
 
-    public static HBox mainHBoxLayOut () {
-        HBox mainLayOut = new HBox();
+    public static HBox mainHBoxLayout () {
+        HBox mainLayout = new HBox();
 
-        mainLayOut.setSpacing(UIInformation.stageHeight() * 0.1);
+        mainLayout.setSpacing(UIInformation.stageHeight() * 0.1);
 
-        mainLayOut.getChildren().add(buttonNumber());
-        mainLayOut.getChildren().add(orderFinalization());
+        mainLayout.getChildren().add(buttonNumber());
+        mainLayout.getChildren().add(orderFinalization());
 
-        mainLayOut.setTranslateX(UIInformation.stageWidth() * 0.03);
+        mainLayout.setTranslateX(UIInformation.stageWidth() * 0.03);
 
-        return mainLayOut;
+        return mainLayout;
     }
 }
 
@@ -273,7 +273,7 @@ public class Star_Grill_UIModel extends Application {
 
         Scene scene = new Scene(root, UIInformation.stageWidth(), UIInformation.stageHeight());
 
-        root.getChildren().add(FinalLayOut.mainHBoxLayOut());
+        root.getChildren().add(FinalLayout.mainHBoxLayout());
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Star Grill");
