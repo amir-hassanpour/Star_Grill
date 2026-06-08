@@ -1,9 +1,11 @@
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -92,7 +94,6 @@ class UIInformation {
     public static Map<String, Integer> frozen() { return FROZEN; }
 
     public static Map<String, Integer> topping() { return TOPPING; }
-
 }
 
 abstract class ButtonLayOut {
@@ -121,48 +122,10 @@ class FoodButtonLayOut extends ButtonLayOut {
     }
 }
 
-public class Star_Grill_UIModel extends Application {
+class FinalLayOut {
     private static Label foodNumberLabel;
 
-    private static TextField customAmount () {
-        TextField customAmountVBox =  new TextField();
-
-        customAmountVBox.setPrefWidth(UIInformation.stageWidth() * 0.1);
-        customAmountVBox.setPrefHeight(UIInformation.stageHeight() * 0.05);
-
-        return customAmountVBox;
-    }
-
-    private static VBox orderExtraDetails () {
-        VBox orderExtraDetailsVBox = new VBox();
-
-        Button toGoButton = new Button();
-
-        toGoButton.setPrefWidth(UIInformation.stageWidth() * 0.1);
-        toGoButton.setPrefHeight(UIInformation.stageHeight() * 0.05);
-        toGoButton.setText("To Go");
-
-        TextField extraDetails = new TextField();
-        extraDetails.setPrefWidth(UIInformation.stageWidth() * 0.1);
-        extraDetails.setPrefHeight(UIInformation.stageHeight() * 0.05);
-
-        orderExtraDetailsVBox.getChildren().addAll(extraDetails, toGoButton);
-
-        return orderExtraDetailsVBox;
-    }
-
-
-    private static VBox orderFinalization() {
-        VBox extraDetail = new VBox();
-        extraDetail.setSpacing(UIInformation.stageHeight() * 0.02);
-
-        extraDetail.getChildren().add(customAmount());
-        extraDetail.getChildren().add(orderExtraDetails());
-
-        return extraDetail;
-    }
-
-    public static Label orderNumber(int orderNum) {
+    private static Label orderNumber(int orderNum) {
         foodNumberLabel = new Label("Food Number: " + orderNum);
         foodNumberLabel.setFont(new Font(UIInformation.stageHeight() * 0.025));
 
@@ -184,23 +147,125 @@ public class Star_Grill_UIModel extends Application {
         buttonNumberVBox.getChildren().add(foodNumberLabel);
         buttonNumberVBox.getChildren().add(buttonLayout);
 
-        buttonNumberVBox.setTranslateX(UIInformation.stageWidth() * 0.03);
         buttonNumberVBox.setTranslateY(UIInformation.stageHeight() * 0.03);
 
         return buttonNumberVBox;
     }
 
-    private static HBox mainHBoxLayOut () {
+    private static TextField customAmount () {
+        TextField customAmount =  new TextField();
+
+        customAmount.setPromptText("Custom Amount");
+
+        customAmount.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        customAmount.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        customAmount.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+            }
+
+            return null;
+        }));
+
+        customAmount.setOnAction(event -> {
+           String custom = customAmount.getText();
+
+           if (!custom.isEmpty() && !custom.equals(".")) {
+               double amount = Double.parseDouble(custom);
+               // TODO make a funciton that recieves this amount ad puts it on the screen as well as adding it to the
+               //  total cost
+               System.out.println(amount);
+           }
+        });
+
+        return customAmount;
+    }
+
+    private static VBox orderExtraDetails () {
+        VBox orderExtraDetailsVBox = new VBox();
+        orderExtraDetailsVBox.setSpacing(UIInformation.stageHeight() * 0.01);
+
+        Button toGoButton = new Button();
+
+        toGoButton.setPrefWidth(UIInformation.stageWidth() * 0.15);
+        toGoButton.setPrefHeight(UIInformation.stageHeight() * 0.05);
+        toGoButton.setText("To Go");
+
+        toGoButton.setStyle("-fx-border-color: black;" +
+                "-fx-font-size: " + UIInformation.stageWidth() * 0.01 + "px;" +
+                "-fx-font-weight: bold;");
+
+        TextField extraDetails = new TextField();
+        extraDetails.setPrefWidth(UIInformation.stageWidth() * 0.15);
+        extraDetails.setPrefHeight(UIInformation.stageHeight() * 0.05);
+        extraDetails.setPromptText("Extra Details");
+
+        extraDetails.setOnAction(event -> {
+           String details = extraDetails.getText();
+
+           if (!details.isEmpty()) {
+               // ToDo make a funtions to receieve extra details
+               System.out.println(details);
+           }
+        });
+
+        orderExtraDetailsVBox.getChildren().addAll(extraDetails, toGoButton);
+
+        return orderExtraDetailsVBox;
+    }
+
+
+    private static VBox orderFinalization() {
+        VBox extraDetail = new VBox();
+        extraDetail.setSpacing(UIInformation.stageHeight() * 0.2);
+
+        extraDetail.getChildren().add(customAmount());
+        extraDetail.getChildren().add(orderExtraDetails());
+        extraDetail.getChildren().add(paymentMethod());
+
+        extraDetail.setTranslateY(UIInformation.stageHeight() * 0.03);
+
+        return extraDetail;
+    }
+
+    private static HBox paymentMethod() {
+        HBox paymentMethodHBox = new HBox();
+
+        Button cashPay =  new Button("Cash");
+        Button cardPay =  new Button("Card");
+
+        paymentMethodHBox.getChildren().addAll(cashPay, cardPay);
+
+        cashPay.setPrefWidth(UIInformation.stageWidth() * 0.075);
+        cashPay.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        cardPay.setPrefWidth(UIInformation.stageWidth() * 0.075);
+        cardPay.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        cashPay.setStyle("-fx-border-color: black;");
+        cardPay.setStyle("-fx-border-color: black;");
+
+        return paymentMethodHBox;
+    }
+
+    public static HBox mainHBoxLayOut () {
         HBox mainLayOut = new HBox();
 
-        mainLayOut.setSpacing(UIInformation.stageHeight() * 0.03);
+        mainLayOut.setSpacing(UIInformation.stageHeight() * 0.1);
 
         mainLayOut.getChildren().add(buttonNumber());
         mainLayOut.getChildren().add(orderFinalization());
 
+        mainLayOut.setTranslateX(UIInformation.stageWidth() * 0.03);
+
         return mainLayOut;
     }
+}
 
+public class Star_Grill_UIModel extends Application {
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
@@ -208,7 +273,7 @@ public class Star_Grill_UIModel extends Application {
 
         Scene scene = new Scene(root, UIInformation.stageWidth(), UIInformation.stageHeight());
 
-        root.getChildren().add(mainHBoxLayOut());
+        root.getChildren().add(FinalLayOut.mainHBoxLayOut());
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Star Grill");
