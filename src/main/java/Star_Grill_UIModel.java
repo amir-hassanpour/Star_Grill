@@ -13,8 +13,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,7 @@ class UIInformation {
 
     public static int foodNumber() { return FOOD_NUMBER; }
 
-    public static int drinkNumber() { return  DRINK_NUMBER; }
+    public static int drinkNumber() { return DRINK_NUMBER; }
 
     public static int frozenNumber() { return FROZEN_NUMBER; }
 
@@ -97,7 +99,35 @@ class UIInformation {
 }
 
 abstract class ButtonLayout {
-    public abstract Node buttonCreator();
+    abstract Node buttonCreator();
+
+    protected HBox buttonCreator(char itemCode) {
+        HBox buttonLayoutHBox = new HBox();
+
+        VBox drinkColumnVBox = null;
+
+        int counter = 0;
+
+        for (String keys: UIInformation.drink().keySet()) {
+            int leng = keys.length();
+
+            if (keys.charAt(leng - 1) != itemCode) {
+                continue;
+            }
+            else if (counter % 8 == 0) {
+                drinkColumnVBox = new VBox();
+                drinkColumnVBox.setSpacing(UIInformation.stageHeight() * 0.05);
+                buttonLayoutHBox.getChildren().add(drinkColumnVBox);
+            }
+            // ToDo add functionality to the button by making chnages to the total amount and display in the pane
+            Button drinkButton = new Button();
+            drinkButton.setText(keys.substring(0, leng - 1));
+
+            drinkColumnVBox.getChildren().add(drinkButton);
+        }
+
+        return buttonLayoutHBox;
+    }
 }
 
 class FoodButtonLayout extends ButtonLayout {
@@ -110,6 +140,7 @@ class FoodButtonLayout extends ButtonLayout {
                 UIInformation.foodNumber(), UIInformation.stageHeight() * 0.06);
 
         for (String keys: UIInformation.food().keySet()) {
+            // ToDo add functionality to the buttons
             Button button = new Button();
             button.setText(keys);
             button.setPrefWidth(UIInformation.stageWidth() * 0.1);
@@ -120,6 +151,83 @@ class FoodButtonLayout extends ButtonLayout {
         }
         return buttonLayout;
     }
+}
+
+class DrinkButtonLayout extends ButtonLayout {
+    @Override
+    public HBox buttonCreator() {
+        return super.buttonCreator('@');
+    }
+    public void DrinkTaken() {
+        // ToDo add method for when the button is created button functionality
+    }
+}
+
+class FrozenButtonLayout extends ButtonLayout {
+    @Override
+    public HBox buttonCreator() {
+        return super.buttonCreator('#');
+    }
+    public void FrozenTaken() {
+        // ToDo add method for when the button is created button functionality
+    }
+}
+
+class ToppingButtonLayout extends ButtonLayout {
+    @Override
+    public HBox buttonCreator() {
+        return super.buttonCreator('$');
+    }
+    public void ToppingTaken() {
+        // ToDo add method for when the button is created button functionality
+    }
+}
+
+class PaneCreator {
+    private static Pane mainPane;
+
+    public static Pane orderLayout(double width, double height) {
+        mainPane = new Pane();
+        mainPane.setPrefSize(width, height);
+
+        mainPane.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: black;"
+        );
+        mainPane.setTranslateY(UIInformation.stageHeight() * 0.1);
+        return mainPane;
+    }
+
+    public static Pane updateOrderLayout(List<String> orders) {
+        HBox mainOrderHBox = new HBox();
+
+        int num = 0;
+
+        VBox columnOrder = null;
+
+        for  (String order: orders) {
+            if (num % 10 == 0) {
+                columnOrder = new VBox();
+                mainOrderHBox.getChildren().add(columnOrder);
+            }
+            // ToDo add functionality to the buttons to get removed when click
+            Button orderButton = new Button();
+
+            orderButton.setText(order);
+            columnOrder.getChildren().add(orderButton);
+
+            num ++;
+        }
+
+        mainPane.getChildren().add(mainOrderHBox);
+
+        return mainPane;
+    }
+}
+
+// ToDo this is the popup button at the top of the orderpane
+abstract class PopUpsLayout {
+    abstract void PopUpsLayout(String itemCode);
 }
 
 class FinalLayout {
@@ -153,7 +261,7 @@ class FinalLayout {
     }
 
     private static TextField customAmount () {
-        TextField customAmount =  new TextField();
+        TextField customAmount = new TextField();
 
         customAmount.setPromptText("Custom Amount");
 
@@ -175,7 +283,7 @@ class FinalLayout {
 
            if (!custom.isEmpty() && !custom.equals(".")) {
                double amount = Double.parseDouble(custom);
-               // TODO make a funciton that recieves this amount ad puts it on the screen as well as adding it to the
+               // TODO make a funciton that recieves this amount and puts it on the screen as well as adding it to the
                //  total cost
                System.out.println(amount);
            }
@@ -234,8 +342,8 @@ class FinalLayout {
     private static HBox paymentMethod() {
         HBox paymentMethodHBox = new HBox();
 
-        Button cashPay =  new Button("Cash");
-        Button cardPay =  new Button("Card");
+        Button cashPay = new Button("Cash");
+        Button cardPay = new Button("Card");
 
         paymentMethodHBox.getChildren().addAll(cashPay, cardPay);
 
@@ -257,6 +365,7 @@ class FinalLayout {
         mainLayout.setSpacing(UIInformation.stageHeight() * 0.1);
 
         mainLayout.getChildren().add(buttonNumber());
+        mainLayout.getChildren().add(PaneCreator.orderLayout(UIInformation.stageWidth() * 0.53, UIInformation.stageHeight() * 0.6));
         mainLayout.getChildren().add(orderFinalization());
 
         mainLayout.setTranslateX(UIInformation.stageWidth() * 0.03);
