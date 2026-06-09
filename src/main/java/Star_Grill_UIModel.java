@@ -225,9 +225,11 @@ class PaneCreator {
     }
 }
 
-// ToDo this is the popup button at the top of the orderpane
-abstract class PopUpsLayout {
-    abstract void PopUpsLayout(String itemCode);
+class PopUpsLayout {
+    public Pane PopUpsLayout(String itemCode) {
+
+        return new Pane();
+    }
 }
 
 class FinalLayout {
