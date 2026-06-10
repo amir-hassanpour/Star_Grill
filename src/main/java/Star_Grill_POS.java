@@ -96,3 +96,11 @@ class Payments {
         return total;
     }
 }
+
+class cashOpener {
+
+}
+
+class print {
+
+}
