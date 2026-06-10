@@ -226,52 +226,58 @@ class PopUpsLayout {
         Pane drinkPopUpsPane = new Pane();
         drinkPopUpsPane.getChildren().add(drinkHBox);
 
+        drinkHBox.setPrefHeight(UIInformation.stageHeight() * 0.6);
+        drinkHBox.setPrefWidth(UIInformation.stageWidth() * 0.6);
+
+        drinkPopUpsPane.setTranslateY(UIInformation.stageHeight() * 0.2);
+        drinkPopUpsPane.setTranslateX(UIInformation.stageWidth() * 0.2);
+
         return drinkPopUpsPane;
     }
 }
 
 class DrinkPopUpsLayout extends PopUpsLayout {
     private Pane drinkLayout() {
-        HBox drinkHBox = new HBox();
+        HBox drinkPane = new HBox();
 
         DrinkButtonLayout buttonHBox = new DrinkButtonLayout();
         PaneCreator paneCreator = new PaneCreator();
 
-        drinkHBox.setSpacing(UIInformation.stageHeight() * 0.05);
-        drinkHBox.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+        drinkPane.setSpacing(UIInformation.stageHeight() * 0.05);
+        drinkPane.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
 
-        return super.PopUpsLayout(drinkHBox);
+        return super.PopUpsLayout(drinkPane);
     }
 }
 
 class FrozenPopUpsLayout extends PopUpsLayout {
     private Pane frozenLayout() {
-        HBox frozenHBox = new HBox();
+        HBox frozenPane = new HBox();
 
         FrozenButtonLayout buttonHBox = new FrozenButtonLayout();
         PaneCreator paneCreator = new PaneCreator();
 
-        frozenHBox.setSpacing(UIInformation.stageHeight() * 0.05);
-        frozenHBox.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+        frozenPane.setSpacing(UIInformation.stageHeight() * 0.05);
+        frozenPane.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
 
-        return super.PopUpsLayout(frozenHBox);
+        return super.PopUpsLayout(frozenPane);
     }
 }
 
 class ToppingPopUpsLayout extends PopUpsLayout {
     private Pane frozenLayout() {
-        HBox toppingHBox = new HBox();
+        HBox toppingPane = new HBox();
 
         ToppingButtonLayout buttonHBox = new ToppingButtonLayout();
         PaneCreator paneCreator = new PaneCreator();
 
-        toppingHBox.setSpacing(UIInformation.stageHeight() * 0.05);
-        toppingHBox.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+        toppingPane.setSpacing(UIInformation.stageHeight() * 0.05);
+        toppingPane.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
 
-        return super.PopUpsLayout(toppingHBox);
+        return super.PopUpsLayout(toppingPane);
     }
 }
 
