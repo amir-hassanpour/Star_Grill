@@ -1,5 +1,4 @@
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -8,15 +7,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -226,9 +222,56 @@ class PaneCreator {
 }
 
 class PopUpsLayout {
-    public Pane PopUpsLayout(String itemCode) {
+    public Pane PopUpsLayout(HBox drinkHBox) {
+        Pane drinkPopUpsPane = new Pane();
+        drinkPopUpsPane.getChildren().add(drinkHBox);
 
-        return new Pane();
+        return drinkPopUpsPane;
+    }
+}
+
+class DrinkPopUpsLayout extends PopUpsLayout {
+    private Pane drinkLayout() {
+        HBox drinkHBox = new HBox();
+
+        DrinkButtonLayout buttonHBox = new DrinkButtonLayout();
+        PaneCreator paneCreator = new PaneCreator();
+
+        drinkHBox.setSpacing(UIInformation.stageHeight() * 0.05);
+        drinkHBox.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+
+        return super.PopUpsLayout(drinkHBox);
+    }
+}
+
+class FrozenPopUpsLayout extends PopUpsLayout {
+    private Pane frozenLayout() {
+        HBox frozenHBox = new HBox();
+
+        FrozenButtonLayout buttonHBox = new FrozenButtonLayout();
+        PaneCreator paneCreator = new PaneCreator();
+
+        frozenHBox.setSpacing(UIInformation.stageHeight() * 0.05);
+        frozenHBox.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+
+        return super.PopUpsLayout(frozenHBox);
+    }
+}
+
+class ToppingPopUpsLayout extends PopUpsLayout {
+    private Pane frozenLayout() {
+        HBox toppingHBox = new HBox();
+
+        ToppingButtonLayout buttonHBox = new ToppingButtonLayout();
+        PaneCreator paneCreator = new PaneCreator();
+
+        toppingHBox.setSpacing(UIInformation.stageHeight() * 0.05);
+        toppingHBox.getChildren().addAll(buttonHBox.buttonCreator(),
+                paneCreator.orderLayout(UIInformation.stageWidth()*0.7*0.5, UIInformation.stageHeight()*0.7*0.8));
+
+        return super.PopUpsLayout(toppingHBox);
     }
 }
 
