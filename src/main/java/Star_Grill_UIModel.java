@@ -209,7 +209,7 @@ class PaneCreator {
             // ToDo add functionality to the buttons to get removed when click
             Button orderButton = new Button();
 
-            orderButton.setText(order);
+            orderButton.setText(order.substring(0, order.length() - 1));
             columnOrder.getChildren().add(orderButton);
 
             num ++;
@@ -222,17 +222,23 @@ class PaneCreator {
 }
 
 class PopUpsLayout {
+    private Pane popUpPane;
+
+    public void displayPopUP() {
+        popUpPane.setVisible(true);
+    }
+
     public Pane PopUpsLayout(HBox drinkHBox) {
-        Pane drinkPopUpsPane = new Pane();
-        drinkPopUpsPane.getChildren().add(drinkHBox);
+        popUpPane = new Pane();
+        popUpPane.getChildren().add(drinkHBox);
 
         drinkHBox.setPrefHeight(UIInformation.stageHeight() * 0.6);
         drinkHBox.setPrefWidth(UIInformation.stageWidth() * 0.6);
 
-        drinkPopUpsPane.setTranslateY(UIInformation.stageHeight() * 0.2);
-        drinkPopUpsPane.setTranslateX(UIInformation.stageWidth() * 0.2);
+        popUpPane.setTranslateY(UIInformation.stageHeight() * 0.2);
+        popUpPane.setTranslateX(UIInformation.stageWidth() * 0.2);
 
-        return drinkPopUpsPane;
+        return popUpPane;
     }
 }
 
