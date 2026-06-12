@@ -251,3 +251,15 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         super.printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
     }
 }
+
+class NextReset {
+    public static void nextReset(boolean ifTrue) {
+        Orders nextResetOrders = new Orders();
+        nextResetOrders.clearOrders();
+
+        if (ifTrue)
+            CustomerNumber.customerNumberInitializer();
+        else
+            CustomerNumber.nextInt();
+    }
+}
