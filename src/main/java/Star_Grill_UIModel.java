@@ -664,7 +664,7 @@ class FinalLayout {
         next.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.015));
         next.setPrefWidth(UIInformation.stageWidth() * 0.1);
         next.setPrefHeight(UIInformation.stageHeight() * 0.05);
-
+        // ToDo next button doesn't work as well as the cash button and we also have to add a cashoppener button
         next.setOnAction(e -> {
             NextReset.nextReset(false);
             updateTotal();
