@@ -8,15 +8,16 @@ import java.util.List;
 
 public class Star_Grill_Text_File_Editor {
     private String fileName;
-    private Path path = Paths.get(fileName);
+    private Path path;
 
     Star_Grill_Text_File_Editor(String fileName) {
         this.fileName = fileName;
+        this.path = Paths.get(fileName);
     }
 
     public void addLastLine(String lineAdd) {
-        try (FileWriter writer = new FileWriter("file.txt", true)) {
-            writer.write(lineAdd + "\n");
+        try (FileWriter writer = new FileWriter(fileName, true)) {
+            writer.write(lineAdd + System.lineSeparator());
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -32,12 +33,15 @@ public class Star_Grill_Text_File_Editor {
     public String removeLastLine() throws IOException {
         List<String> lines = Files.readAllLines(path);
 
-        if (!lines.isEmpty()) {
-            lines.remove(lines.size() - 1);
+        if (lines.isEmpty()) {
+            return null;
         }
+
+        String removedLine = lines.remove(lines.size() - 1);
+
         Files.write(path, lines);
 
-        return String.join(System.lineSeparator(), lines).trim();
+        return removedLine;
     }
 
     public long countLines() throws IOException {
@@ -47,23 +51,24 @@ public class Star_Grill_Text_File_Editor {
     }
 
     public void removeAllLines() throws IOException {
-        long count = countLines();
-
-        for (int i = 0; i < count; i++) {
-            removeLastLine();
-        }
+        Files.write(path, new ArrayList<>());
     }
 
     public List<String> removeLastLines(int count) throws IOException {
-        List<String> lines = new ArrayList<>();
+        List<String> removedLines = new ArrayList<>();
 
-        if (count > countLines())
+        List<String> currentLines = Files.readAllLines(path);
+
+        if (count > currentLines.size()) {
             return null;
-
-        for (int i = 0; i < count; i++) {
-            lines.add(removeLastLine());
         }
 
-        return lines;
+        for (int i = 0; i < count; i++) {
+            removedLines.add(currentLines.remove(currentLines.size() - 1));
+        }
+
+        Files.write(path, currentLines);
+
+        return removedLines;
     }
 }

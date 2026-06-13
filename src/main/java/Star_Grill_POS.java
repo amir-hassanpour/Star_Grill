@@ -98,7 +98,7 @@ class ToppingOrders extends Orders {
 }
 
 class RecordAllOrders {
-    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor("Star_Grill_info/Order_History");
+    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor("Star_Grill_info/Order_History.txt");
 
     public static void recordAllOrders(String paymentType) {
         List<String> allOrders = new ArrayList<>();
@@ -224,13 +224,13 @@ class CustomerReceiptPrinter extends ReceiptPrint {
     private static final String customerFileNama = "Star_Grill_info/CustomerReceiptPrinter.txt";
     private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor(customerFileNama);
 
-    public void CustomerReceiptPrint() throws IOException {
+    public static void CustomerReceiptPrint() throws IOException {
         editor.removeAllLines();
 
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We’d appreciate your review!");
 
-        super.printTextFile("Star_Grill_info/CustomerReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/CustomerReceiptPrinter.txt");
     }
 }
 
@@ -238,7 +238,7 @@ class OrdersReceiptPrinter extends ReceiptPrint {
     private static final String customerFileNama = "Star_Grill_info/Orders.txt";
     private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor(customerFileNama);
 
-    public void OrdersReceiptPrint() throws IOException {
+    public static void OrdersReceiptPrint() throws IOException {
         editor.removeAllLines();
 
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
@@ -251,7 +251,7 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         editor.addLastLines(ExtraDetails.getExtraDetails());
         editor.addLastLine(Time.getHourMinute());
 
-        super.printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
     }
 }
 

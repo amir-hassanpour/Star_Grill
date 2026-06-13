@@ -591,21 +591,146 @@ class FinalLayout {
         return extraDetail;
     }
 
+    private static Pane cashHelper() {
+        double stageW = UIInformation.stageWidth();
+        double stageH = UIInformation.stageHeight();
+        double paneW = stageW * 0.22;
+        double paneH = stageH * 0.18;
+
+        Pane popupPane = new Pane();
+        popupPane.setPrefSize(paneW, paneH);
+
+        popupPane.setLayoutX((stageW - paneW) / 2);
+        popupPane.setLayoutY((stageH - paneH) / 2);
+
+        popupPane.setStyle(
+                "-fx-background-color: #e8dddd;" +
+                        "-fx-border-color: black;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 8;"
+        );
+
+        TextField inputBox = new TextField();
+        inputBox.setPromptText("Enter amount");
+        inputBox.setLayoutX(paneW * 0.10);
+        inputBox.setLayoutY(paneH * 0.15);
+        inputBox.setPrefWidth(paneW * 0.80);
+        inputBox.setPrefHeight(paneH * 0.25);
+
+        Button submitButton = new Button("Submit");
+        submitButton.setLayoutX(paneW * 0.30);
+        submitButton.setLayoutY(paneH * 0.50);
+        submitButton.setPrefWidth(paneW * 0.40);
+        submitButton.setPrefHeight(paneH * 0.22);
+
+        Label messageLabel = new Label("");
+        messageLabel.setLayoutX(paneW * 0.36);
+        messageLabel.setLayoutY(paneH * 0.76);
+
+        messageLabel.setStyle(
+                "-fx-font-size: " + (stageW * 0.012) + "px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        inputBox.setStyle(
+                "-fx-font-size: " + (stageW * 0.010) + "px;"
+        );
+
+        submitButton.setStyle(
+                "-fx-font-size: " + (stageW * 0.010) + "px;"
+        );
+
+        inputBox.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*(\\.\\d*)?")) {
+                inputBox.setText(oldValue);
+            }
+        });
+
+        inputBox.setOnAction(e -> {
+            messageLabel.setText("hey there");
+        });
+
+        submitButton.setOnAction(e -> {
+            popupPane.setVisible(false);
+        });
+
+        popupPane.getChildren().addAll(inputBox, submitButton, messageLabel);
+
+        return popupPane;
+    }
+
     private static Button nextAction() {
         Button next = new Button("Next");
+        next.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.015));
         next.setPrefWidth(UIInformation.stageWidth() * 0.1);
         next.setPrefHeight(UIInformation.stageHeight() * 0.05);
 
-        CustomerNumber.nextInt();
-
-        NextReset.nextReset(false);
-        updateTotal();
-        updateOrderNumber(CustomerNumber.customerNumber);
-
-        UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
-        updatingLayouta.updateOrderLayouts();
+        next.setOnAction(e -> {
+            NextReset.nextReset(false);
+            updateTotal();
+            UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
+            updatingLayouta.updateOrderLayouts();
+            updateOrderNumber(CustomerNumber.customerNumber);
+        });
 
         return next;
+    }
+
+    private static Button resetAction() {
+        Button reset = new Button("Reset");
+        reset.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.012));
+        reset.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        reset.setMaxHeight(UIInformation.stageHeight() * 0.05);
+        reset.setOnAction(event -> {NextReset.nextReset(true);
+            updateTotal();
+            updateOrderNumber(CustomerNumber.customerNumber);
+
+            UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
+            updatingLayouta.updateOrderLayouts();}
+        );
+
+        return reset;
+    }
+
+    private static Button exitAction() {
+        Button exit = new Button("Exit");
+        exit.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.015));
+        exit.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        exit.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        exit.setOnAction(event -> System.exit(0));
+
+        return exit;
+    }
+
+    private static Button printAction() {
+        Button print = new Button("Print");
+        print.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.015));
+        print.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        print.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        print.setOnAction(event -> {
+            try {
+                CustomerReceiptPrinter.CustomerReceiptPrint();
+                OrdersReceiptPrinter.OrdersReceiptPrint();
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return print;
+    }
+
+    private static HBox finalization () {
+        HBox finalization = new HBox();
+        finalization.setSpacing(UIInformation.stageHeight() * 0.02);
+
+        finalization.getChildren().addAll(exitAction(), resetAction(), nextAction(), printAction());
+
+        finalization.setAlignment(Pos.CENTER);
+
+        return finalization;
     }
 
     private static HBox paymentMethod() {
@@ -615,13 +740,15 @@ class FinalLayout {
         Button cardPay = new Button("Card");
 
         cashPay.setOnAction(event -> {
-            nextAction();
             RecordAllOrders.recordAllOrders("Cash");
+            cashHelper();
+            nextAction();
         });
 
         cardPay.setOnAction(event -> {
-            nextAction();
             RecordAllOrders.recordAllOrders("Card");
+            nextAction();
+            nextAction();
         });
 
         paymentMethodHBox.getChildren().addAll(cashPay, cardPay);
@@ -651,6 +778,7 @@ class FinalLayout {
         middleVBox.getChildren().add(popUpButtonLayout.buttonCreator());
         middleVBox.getChildren().add(mainPane);
         middleVBox.getChildren().add(updateTotal());
+        middleVBox.getChildren().add(finalization());
 
         middleVBox.setAlignment(Pos.CENTER);
 
