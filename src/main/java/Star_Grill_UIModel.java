@@ -1,18 +1,23 @@
 import javafx.application.Application;
+import javafx.event.Event;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +30,20 @@ class UIInformation {
     private static int DRINK_NUMBER;
     private static int FROZEN_NUMBER;
     private static int TOPPING_NUMBER;
+    private static int popUpButtonNumber;
+    private static int allItemsNumber;
 
     private static final double STAGE_WIDTH = screenBounds.getWidth();
     private static final double STAGE_HEIGHT = screenBounds.getHeight();
 
     public static final Path filePath = Path.of("Star_Grill_info/food_options");
 
-    public static Map<String, Integer> FOOD = new HashMap<>();
-    public static Map<String, Integer> DRINK = new HashMap<>();
-    public static Map<String, Integer> FROZEN = new HashMap<>();
-    public static Map<String, Integer> TOPPING = new HashMap<>();
+    private static final Map<String, Integer> FOOD = new HashMap<>();
+    private static final Map<String, Integer> DRINK = new HashMap<>();
+    private static final Map<String, Integer> FROZEN = new HashMap<>();
+    private static final Map<String, Integer> TOPPING = new HashMap<>();
+    private static final Map<String, Integer> popUpButton = new HashMap<>();
+    private static final Map<String, Integer> allItems = new HashMap<>();
 
     public UIInformation() {
         try {
@@ -47,8 +56,6 @@ class UIInformation {
                 int lengthProduct = newLine[0].length();
 
                 char lastChar = newLine[0].charAt(lengthProduct - 1);
-
-                newLine[0] = newLine[0].substring(0, lengthProduct - 1);
 
                 if (lastChar == '!') {
                     FOOD.put(newLine[0], Integer.parseInt(newLine[1]));
@@ -66,6 +73,13 @@ class UIInformation {
                     TOPPING.put(newLine[0], Integer.parseInt(newLine[1]));
                     TOPPING_NUMBER++;
                 }
+                else if (lastChar == '%') {
+                    popUpButton.put(newLine[0], Integer.parseInt(newLine[1]));
+                    popUpButtonNumber++;
+                }
+
+                allItems.put(newLine[0], Integer.parseInt(newLine[1]));
+                allItemsNumber ++;
             }
         }
         catch (IOException e) {
@@ -85,6 +99,10 @@ class UIInformation {
 
     public static int toppingNumber() { return TOPPING_NUMBER; }
 
+    public static int popUpButtonNumber() { return popUpButtonNumber; }
+
+    public static int allItemsNumber() { return allItemsNumber; }
+
     public static Map<String, Integer> food() { return FOOD; }
 
     public static Map<String, Integer> drink() { return DRINK; }
@@ -92,34 +110,79 @@ class UIInformation {
     public static Map<String, Integer> frozen() { return FROZEN; }
 
     public static Map<String, Integer> topping() { return TOPPING; }
+
+    public static Map<String, Integer> popUpButton() { return popUpButton; }
+
+    public static Map<String, Integer> allItems() { return allItems; }
 }
 
 abstract class ButtonLayout {
     abstract Node buttonCreator();
 
-    protected HBox buttonCreator(char itemCode) {
+    protected HBox buttonCreator(char itemCode, int buttonNumber, double buttonWidth) {
         HBox buttonLayoutHBox = new HBox();
-
+        buttonLayoutHBox.setSpacing(UIInformation.stageWidth() * 0.01);
+        buttonLayoutHBox.setAlignment(Pos.CENTER);
         VBox drinkColumnVBox = null;
 
         int counter = 0;
 
-        for (String keys: UIInformation.drink().keySet()) {
+        Map<String, Integer> items = null;
+
+        if (itemCode == '@') {
+            items = UIInformation.drink();
+        }
+        else if (itemCode == '#') {
+            items = UIInformation.frozen();
+        }
+        else if (itemCode == '$') {
+            items = UIInformation.topping();
+        }
+        else {
+            items = UIInformation.popUpButton();
+        }
+
+        for (String keys: items.keySet()) {
             int leng = keys.length();
 
-            if (keys.charAt(leng - 1) != itemCode) {
-                continue;
-            }
-            else if (counter % 8 == 0) {
+            if (counter % buttonNumber == 0) {
                 drinkColumnVBox = new VBox();
-                drinkColumnVBox.setSpacing(UIInformation.stageHeight() * 0.05);
+                drinkColumnVBox.setSpacing(UIInformation.stageHeight() * 0.02);
                 buttonLayoutHBox.getChildren().add(drinkColumnVBox);
             }
-            // ToDo add functionality to the button by making chnages to the total amount and display in the pane
-            Button drinkButton = new Button();
-            drinkButton.setText(keys.substring(0, leng - 1));
 
-            drinkColumnVBox.getChildren().add(drinkButton);
+            Button productButton = new Button();
+            productButton.setText(keys.substring(0, leng - 1));
+
+            productButton.setFont(Font.font("Arial", FontWeight.BOLD, UIInformation.stageWidth() * 0.015));
+
+            productButton.setMinWidth(UIInformation.stageWidth() * buttonWidth);
+            productButton.setMaxWidth(UIInformation.stageWidth() * buttonWidth);
+
+            Map<String, Integer> finalItems = items;
+
+            productButton.setOnAction(e -> {
+                if (itemCode == '@') {
+                    DrinkButtonLayout drink = new DrinkButtonLayout();
+                    drink.DrinkTaken(keys, finalItems.get(keys));
+                }
+                else if (itemCode == '#') {
+                    FrozenButtonLayout frozen = new FrozenButtonLayout();
+                    frozen.FrozenTaken(keys, finalItems.get(keys));
+                }
+                else if (itemCode == '$') {
+                    ToppingButtonLayout topping = new ToppingButtonLayout();
+                    topping.ToppingTaken(keys, finalItems.get(keys));
+                }
+                else if (itemCode == '%') {
+                    PopUpButtonLayout.popUpAction(keys);
+                }
+                FinalLayout.mainPaneCreator.updateOrderLayout(Orders.orders);
+            });
+
+            drinkColumnVBox.getChildren().add(productButton);
+
+            counter++;
         }
 
         return buttonLayoutHBox;
@@ -136,78 +199,160 @@ class FoodButtonLayout extends ButtonLayout {
                 UIInformation.foodNumber(), UIInformation.stageHeight() * 0.06);
 
         for (String keys: UIInformation.food().keySet()) {
-            // ToDo add functionality to the buttons
             Button button = new Button();
-            button.setText(keys);
+            button.setText(keys.substring(0, keys.length() - 1));
             button.setPrefWidth(UIInformation.stageWidth() * 0.1);
             button.setStyle("-fx-border-color: black;" +
                     "-fx-font-size: " + buttonHeight * 0.45 + "px;");
 
+            button.setOnAction(e -> foodTaken(keys, UIInformation.food().get(keys)));
+
             buttonLayout.getChildren().add(button);
         }
         return buttonLayout;
+    }
+
+    public void foodTaken(String food, double price) {
+        Orders.addOrder(food);
+        Payments.addTotal(price);
+        FinalLayout.updateTotal();
+        FinalLayout.mainPaneCreator.updateOrderLayout(Orders.orders);
     }
 }
 
 class DrinkButtonLayout extends ButtonLayout {
     @Override
     public HBox buttonCreator() {
-        return super.buttonCreator('@');
+        return super.buttonCreator('@', 10, 0.1);
     }
-    public void DrinkTaken() {
-        // ToDo add method for when the button is created button functionality
+
+    public void DrinkTaken(String drink, double price) {
+        Orders.addOrder(drink);
+        Payments.addTotal(price);
+        DrinkOrders drinkOrders = new DrinkOrders();
+        DrinkPopUpsLayout.paneCreator.updateOrderLayout(drinkOrders.getOrders());
     }
 }
 
 class FrozenButtonLayout extends ButtonLayout {
     @Override
     public HBox buttonCreator() {
-        return super.buttonCreator('#');
+        return super.buttonCreator('#', 10, 0.1);
     }
-    public void FrozenTaken() {
-        // ToDo add method for when the button is created button functionality
+
+    public void FrozenTaken(String frozen, double price) {
+        Orders.addOrder(frozen);
+        Payments.addTotal(price);
+        FrozenOrders frozenOrders = new FrozenOrders();
+        FrozenPopUpsLayout.paneCreator.updateOrderLayout(frozenOrders.getOrders());
     }
 }
 
 class ToppingButtonLayout extends ButtonLayout {
     @Override
     public HBox buttonCreator() {
-        return super.buttonCreator('$');
+        return super.buttonCreator('$', 10, 0.1);
     }
-    public void ToppingTaken() {
-        // ToDo add method for when the button is created button functionality
+
+    public void ToppingTaken(String topping, double price) {
+        Orders.addOrder(topping);
+        Payments.addTotal(price);
+        ToppingOrders toppingOrders = new ToppingOrders();
+        ToppingPopUpsLayout.paneCreator.updateOrderLayout(toppingOrders.getOrders());
+    }
+}
+
+class PopUpButtonLayout extends ButtonLayout {
+    @Override
+    public HBox buttonCreator() { return super.buttonCreator('%', 1, 0.1799); }
+
+    public static void popUpAction(String popUpButton) {
+        if (popUpButton.equals("Drinks%")) {
+            if (DrinkPopUpsLayout.visibleDrink)
+                FinalLayout.popUpMiddleVBox(DrinkPopUpsLayout.drinkLayout());
+            else
+                DrinkPopUpsLayout.drinkPane.setVisible(true);
+                FinalLayout.popUpMiddleVBox(DrinkPopUpsLayout.drinkPane);
+        }
+        else if (popUpButton.equals("Frozen%")) {
+            if (FrozenPopUpsLayout.visibleFrozen)
+                FinalLayout.popUpMiddleVBox(FrozenPopUpsLayout.frozenLayout());
+            else
+                FrozenPopUpsLayout.frozenPane.setVisible(true);
+            FinalLayout.popUpMiddleVBox(FrozenPopUpsLayout.frozenPane);
+        }
+        else if (popUpButton.equals("Toppings%")) {
+            if (ToppingPopUpsLayout.visibleTopping)
+                FinalLayout.popUpMiddleVBox(ToppingPopUpsLayout.toppingLayout());
+            else
+                ToppingPopUpsLayout.toppingPane.setVisible(true);
+            FinalLayout.popUpMiddleVBox(ToppingPopUpsLayout.toppingPane);
+        }
     }
 }
 
 class PaneCreator {
-    private static Pane mainPane;
+    private Pane mainPane;
+    public List<VBox> listVBox = new ArrayList<>();
 
-    public static Pane orderLayout(double width, double height) {
+    public Pane orderLayout(double width, double height) {
         mainPane = new Pane();
         mainPane.setPrefSize(width, height);
 
-        mainPane.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-border-color: black;"
-        );
-        mainPane.setTranslateY(UIInformation.stageHeight() * 0.1);
+        mainPane.setStyle("-fx-background-color: white;" +
+                "-fx-background-radius: 16;" +
+                "-fx-border-color: black;" +
+                "-fx-border-radius: 16;" +
+                "-fx-border-width: 1;");
+
+        for (int i = 0; i < 30; i++) {
+            listVBox.add(new VBox());
+        }
+
         return mainPane;
     }
 
-    public static Pane updateOrderLayout(List<String> orders) {
+    public Pane updateOrderLayout(List<String> orders) {
         HBox mainOrderHBox = new HBox();
-
+        mainOrderHBox.setSpacing(UIInformation.stageWidth() * 0.01);
         int num = 0;
 
         VBox columnOrder = null;
 
-        for  (String order: orders) {
-            if (num % 10 == 0) {
-                columnOrder = new VBox();
+        for (VBox column : listVBox) {
+            column.getChildren().clear();
+        }
+
+        for (String order: orders) {
+            if (num % 11 == 0) {
+                columnOrder = listVBox.get(num/11);
+
+                columnOrder.setSpacing(UIInformation.stageHeight() * 0.012);
                 mainOrderHBox.getChildren().add(columnOrder);
             }
-            // ToDo add functionality to the buttons to get removed when click
+
             Button orderButton = new Button();
+
+            VBox finalColumnOrder = columnOrder;
+            orderButton.setOnAction(e -> {
+                try {
+                    double number = Double.parseDouble(order);
+                    Orders.removeOrder(order);
+                    Payments.subtractTotal(number);
+                }
+                catch (NumberFormatException ex) {
+                    if (order.charAt(order.length() - 1) == '^') {
+                        Orders.removeOrder(order);
+                    }
+                    else {
+                        Orders.removeOrder(order);
+                        Payments.subtractTotal(UIInformation.allItems().get(order));
+                        FinalLayout.updateTotal();
+                    }
+                }
+                UpdateOrdersLayouts update = new UpdateOrdersLayouts();
+                update.updateOrderLayouts();
+            });
 
             orderButton.setText(order.substring(0, order.length() - 1));
             columnOrder.getChildren().add(orderButton);
@@ -215,75 +360,123 @@ class PaneCreator {
             num ++;
         }
 
-        mainPane.getChildren().add(mainOrderHBox);
+        mainOrderHBox.setTranslateX(UIInformation.stageWidth() * 0.01);
+        mainOrderHBox.setTranslateY(UIInformation.stageHeight() * 0.01);
 
+        mainPane.getChildren().add(mainOrderHBox);
         return mainPane;
     }
 }
 
 class PopUpsLayout {
-    private Pane popUpPane;
-
-    public void displayPopUP() {
-        popUpPane.setVisible(true);
-    }
-
-    public Pane PopUpsLayout(HBox drinkHBox) {
-        popUpPane = new Pane();
+    public static Pane PopUpsLayout(Pane popUpPane, HBox drinkHBox) {
         popUpPane.getChildren().add(drinkHBox);
 
-        drinkHBox.setPrefHeight(UIInformation.stageHeight() * 0.6);
-        drinkHBox.setPrefWidth(UIInformation.stageWidth() * 0.6);
+        drinkHBox.setTranslateY(UIInformation.stageHeight() * 0.7 * 0.1);
+        drinkHBox.setTranslateX(UIInformation.stageWidth() * 0.56 * 0.02);
 
-        popUpPane.setTranslateY(UIInformation.stageHeight() * 0.2);
-        popUpPane.setTranslateX(UIInformation.stageWidth() * 0.2);
+        popUpPane.setStyle("-fx-background-color: lightgray;" +
+                "-fx-background-radius: 16;" +
+                "-fx-border-color: #cccccc;" +
+                "-fx-border-radius: 16;" +
+                "-fx-border-width: 1;");
 
+        popUpPane.setPrefHeight(UIInformation.stageHeight() * 0.7);
+        popUpPane.setPrefWidth(UIInformation.stageWidth() * 0.56);
+
+        popUpPane.setTranslateY(UIInformation.stageHeight() * 0.03);
+
+        popUpPane.setOnMouseClicked(Event::consume);
+        popUpPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                    if (popUpPane.isVisible()
+                            && !popUpPane.localToScene(popUpPane.getBoundsInLocal())
+                            .contains(event.getSceneX(), event.getSceneY())) {
+                        popUpPane.setVisible(false);
+                        FinalLayout.middleVBox();
+                    }
+                });
+            }
+        });
         return popUpPane;
     }
 }
 
 class DrinkPopUpsLayout extends PopUpsLayout {
-    private Pane drinkLayout() {
-        HBox drinkPane = new HBox();
+    public static boolean visibleDrink = true;
+    public static final Pane drinkPane = new Pane();
+    public static final PaneCreator paneCreator = new PaneCreator();
+    public static final Pane drinkPaneOrders = paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8);
+
+    public static Pane drinkLayout() {
+        HBox drinkHBox = new HBox();
 
         DrinkButtonLayout buttonHBox = new DrinkButtonLayout();
         PaneCreator paneCreator = new PaneCreator();
 
-        drinkPane.setSpacing(UIInformation.stageHeight() * 0.05);
-        drinkPane.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
+        drinkHBox.setSpacing(UIInformation.stageHeight() * 0.03);
+        drinkHBox.getChildren().addAll(buttonHBox.buttonCreator(), drinkPaneOrders);
 
-        return super.PopUpsLayout(drinkPane);
+        drinkHBox.setAlignment(Pos.CENTER);
+
+        visibleDrink = false;
+
+        return PopUpsLayout(drinkPane, drinkHBox);
     }
 }
 
 class FrozenPopUpsLayout extends PopUpsLayout {
-    private Pane frozenLayout() {
-        HBox frozenPane = new HBox();
+    public static boolean visibleFrozen = true;
+    public static final Pane frozenPane = new Pane();
+    public static PaneCreator paneCreator = new PaneCreator();
+    public static final Pane frozenPaneOrders = paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8);
+
+    public static Pane frozenLayout() {
+        HBox frozenHBox = new HBox();
 
         FrozenButtonLayout buttonHBox = new FrozenButtonLayout();
-        PaneCreator paneCreator = new PaneCreator();
 
-        frozenPane.setSpacing(UIInformation.stageHeight() * 0.05);
-        frozenPane.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
+        frozenHBox.setSpacing(UIInformation.stageHeight() * 0.05);
+        frozenHBox.getChildren().addAll(buttonHBox.buttonCreator(), frozenPaneOrders);
+        visibleFrozen = false;
 
-        return super.PopUpsLayout(frozenPane);
+        return PopUpsLayout(frozenPane, frozenHBox);
     }
 }
 
 class ToppingPopUpsLayout extends PopUpsLayout {
-    private Pane frozenLayout() {
-        HBox toppingPane = new HBox();
+    public static boolean visibleTopping = true;
+    public static final Pane toppingPane = new Pane();
+    public static final PaneCreator paneCreator = new PaneCreator();
+    public static final Pane toppingPaneOrders = paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8);
+
+    public static Pane toppingLayout() {
+        HBox toppingHBox = new HBox();
 
         ToppingButtonLayout buttonHBox = new ToppingButtonLayout();
-        PaneCreator paneCreator = new PaneCreator();
 
-        toppingPane.setSpacing(UIInformation.stageHeight() * 0.05);
-        toppingPane.getChildren().addAll(buttonHBox.buttonCreator(),
-                paneCreator.orderLayout(UIInformation.stageWidth()*0.6*0.5, UIInformation.stageHeight()*0.6*0.8));
+        toppingHBox.setSpacing(UIInformation.stageHeight() * 0.05);
+        toppingHBox.getChildren().addAll(buttonHBox.buttonCreator(),
+                toppingPaneOrders);
 
-        return super.PopUpsLayout(toppingPane);
+        visibleTopping = false;
+
+        return PopUpsLayout(toppingPane, toppingHBox);
+    }
+}
+
+class UpdateOrdersLayouts {
+    public void updateOrderLayouts() {
+        DrinkOrders drink = new DrinkOrders();
+        FrozenOrders frozen = new FrozenOrders();
+        ToppingOrders topping = new ToppingOrders();
+
+        FinalLayout.mainPaneCreator.updateOrderLayout(Orders.orders);
+        DrinkPopUpsLayout.paneCreator.updateOrderLayout(drink.getOrders());
+        ToppingPopUpsLayout.paneCreator.updateOrderLayout(topping.getOrders());
+        FrozenPopUpsLayout.paneCreator.updateOrderLayout(frozen.getOrders());
+        FinalLayout.updateTotal();
     }
 }
 
@@ -340,12 +533,12 @@ class FinalLayout {
 
            if (!custom.isEmpty() && !custom.equals(".")) {
                double amount = Double.parseDouble(custom);
-               // TODO make a funciton that recieves this amount and puts it on the screen as well as adding it to the
-               //  total cost
-               System.out.println(amount);
+               Payments.addTotal(amount);
+               Orders.addOrder(String.valueOf(amount) + "0");
+               UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
+               updatingLayouta.updateOrderLayouts();
            }
         });
-
         return customAmount;
     }
 
@@ -363,6 +556,8 @@ class FinalLayout {
                 "-fx-font-size: " + UIInformation.stageWidth() * 0.01 + "px;" +
                 "-fx-font-weight: bold;");
 
+        toGoButton.setOnAction(event -> {ExtraDetails.toGo();});
+
         TextField extraDetails = new TextField();
         extraDetails.setPrefWidth(UIInformation.stageWidth() * 0.15);
         extraDetails.setPrefHeight(UIInformation.stageHeight() * 0.05);
@@ -372,8 +567,9 @@ class FinalLayout {
            String details = extraDetails.getText();
 
            if (!details.isEmpty()) {
-               // ToDo make a funtions to receieve extra details
-               System.out.println(details);
+               Orders.addOrder(details+'^');
+               UpdateOrdersLayouts updatingLayout = new UpdateOrdersLayouts();
+               updatingLayout.updateOrderLayouts();
            }
         });
 
@@ -381,7 +577,6 @@ class FinalLayout {
 
         return orderExtraDetailsVBox;
     }
-
 
     private static VBox orderFinalization() {
         VBox extraDetail = new VBox();
@@ -396,11 +591,38 @@ class FinalLayout {
         return extraDetail;
     }
 
+    private static Button nextAction() {
+        Button next = new Button("Next");
+        next.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        next.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        CustomerNumber.nextInt();
+
+        NextReset.nextReset(false);
+        updateTotal();
+        updateOrderNumber(CustomerNumber.customerNumber);
+
+        UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
+        updatingLayouta.updateOrderLayouts();
+
+        return next;
+    }
+
     private static HBox paymentMethod() {
         HBox paymentMethodHBox = new HBox();
 
         Button cashPay = new Button("Cash");
         Button cardPay = new Button("Card");
+
+        cashPay.setOnAction(event -> {
+            nextAction();
+            RecordAllOrders.recordAllOrders("Cash");
+        });
+
+        cardPay.setOnAction(event -> {
+            nextAction();
+            RecordAllOrders.recordAllOrders("Card");
+        });
 
         paymentMethodHBox.getChildren().addAll(cashPay, cardPay);
 
@@ -416,13 +638,52 @@ class FinalLayout {
         return paymentMethodHBox;
     }
 
+    private static final VBox middleVBox = new VBox();
+    public static PaneCreator mainPaneCreator = new PaneCreator();
+    public static final Pane mainPane = mainPaneCreator.orderLayout(UIInformation.stageWidth() * 0.53, UIInformation.stageHeight() * 0.6);
+
+    public static VBox middleVBox() {
+        middleVBox.getChildren().clear();
+        middleVBox.setSpacing(UIInformation.stageHeight() * 0.03);
+
+        PopUpButtonLayout popUpButtonLayout = new PopUpButtonLayout();
+
+        middleVBox.getChildren().add(popUpButtonLayout.buttonCreator());
+        middleVBox.getChildren().add(mainPane);
+        middleVBox.getChildren().add(updateTotal());
+
+        middleVBox.setAlignment(Pos.CENTER);
+
+        middleVBox.setTranslateY(UIInformation.stageHeight() * 0.03);
+
+        return middleVBox;
+    }
+
+    public static void popUpMiddleVBox(Pane popUpPane) {
+        middleVBox.getChildren().clear();
+        middleVBox.getChildren().add(popUpPane);
+    }
+
+    public static final VBox customerTotalDisplay = new VBox();
+
+    public static VBox updateTotal() {
+        customerTotalDisplay.getChildren().clear();
+        Label customerTotal = new Label("Customer Total: " + Payments.getTotal());
+        customerTotal.setFont(new Font(UIInformation.stageHeight() * 0.03));
+
+        customerTotalDisplay.setSpacing(UIInformation.stageHeight() * 0.03);
+        customerTotalDisplay.getChildren().add(customerTotal);
+
+        return customerTotalDisplay;
+    }
+
     public static HBox mainHBoxLayout () {
         HBox mainLayout = new HBox();
 
         mainLayout.setSpacing(UIInformation.stageHeight() * 0.1);
 
         mainLayout.getChildren().add(buttonNumber());
-        mainLayout.getChildren().add(PaneCreator.orderLayout(UIInformation.stageWidth() * 0.53, UIInformation.stageHeight() * 0.6));
+        mainLayout.getChildren().add(middleVBox());
         mainLayout.getChildren().add(orderFinalization());
 
         mainLayout.setTranslateX(UIInformation.stageWidth() * 0.03);

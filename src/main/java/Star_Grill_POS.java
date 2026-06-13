@@ -28,11 +28,15 @@ class CustomerNumber {
 }
 
 class Orders {
-    protected static List<String> orders;
+    public static List<String> orders = new ArrayList<>();
 
-    public List<String> addOrder(String newOrder) {
+    public static List<String> addOrder(String newOrder) {
         orders.add(newOrder);
         return orders;
+    }
+
+    public static void removeOrder (String order) {
+        orders.remove(order);
     }
 
     public void clearOrders() {
@@ -50,7 +54,7 @@ class FoodOrders extends Orders {
         List<String> foodOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("!"))
-                foodOrders.add(order.substring(0, order.length() - 1));
+                foodOrders.add(order);
 
         }
         return foodOrders;
@@ -63,7 +67,7 @@ class DrinkOrders extends Orders {
         List<String> drinkOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("@"))
-                drinkOrders.add(order.substring(0, order.length() - 1));
+                drinkOrders.add(order);
         }
         return drinkOrders;
     }
@@ -75,7 +79,7 @@ class FrozenOrders extends Orders {
         List<String> frozenOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("#"))
-                frozenOrders.add(order.substring(0, order.length() - 1));
+                frozenOrders.add(order);
         }
         return frozenOrders;
     }
@@ -87,16 +91,16 @@ class ToppingOrders extends Orders {
         List<String> toppingOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("$"))
-                toppingOrders.add(order.substring(0, order.length() - 1));
+                toppingOrders.add(order);
         }
         return toppingOrders;
     }
 }
 
 class RecordAllOrders {
-    private Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor("Star_Grill_info/Order_History");
+    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor("Star_Grill_info/Order_History");
 
-    public void recordAllOrders(String paymentType) {
+    public static void recordAllOrders(String paymentType) {
         List<String> allOrders = new ArrayList<>();
 
         for (String order: Orders.orders) {
@@ -140,7 +144,10 @@ class ExtraDetails {
     }
 
     public static void toGo() {
-        extraDetails.add("TOGO");
+        if (!extraDetails.contains("TOGO"))
+            extraDetails.add("TOGO");
+        else
+            extraDetails.remove("TOGO");
     }
 
     public static void removeExtraDetails() {
@@ -149,22 +156,18 @@ class ExtraDetails {
 }
 
 class Payments {
-    private double total;
+    private static double total = 0;
 
-    Payments () {
-        total = 0;
-    }
-
-    public double getTotal () {
+    public static double getTotal () {
         return total;
     }
 
-    public double addTotal (double add) {
+    public static double addTotal (double add) {
         total += add;
         return total;
     }
 
-    public double subtractTotal(double sub) {
+    public static double subtractTotal(double sub) {
         total -= sub;
         return total;
     }
@@ -261,5 +264,7 @@ class NextReset {
             CustomerNumber.customerNumberInitializer();
         else
             CustomerNumber.nextInt();
+
+        ExtraDetails.removeExtraDetails();
     }
 }
