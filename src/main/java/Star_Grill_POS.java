@@ -50,7 +50,7 @@ class FoodOrders extends Orders {
         List<String> foodOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("!"))
-                foodOrders.add(order);
+                foodOrders.add(order.substring(0, order.length() - 1));
 
         }
         return foodOrders;
@@ -63,7 +63,7 @@ class DrinkOrders extends Orders {
         List<String> drinkOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("@"))
-                drinkOrders.add(order);
+                drinkOrders.add(order.substring(0, order.length() - 1));
         }
         return drinkOrders;
     }
@@ -75,7 +75,7 @@ class FrozenOrders extends Orders {
         List<String> frozenOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("#"))
-                frozenOrders.add(order);
+                frozenOrders.add(order.substring(0, order.length() - 1));
         }
         return frozenOrders;
     }
@@ -87,7 +87,7 @@ class ToppingOrders extends Orders {
         List<String> toppingOrders = new ArrayList<>();
         for (String order : orders) {
             if (order.contains("$"))
-                toppingOrders.add(order);
+                toppingOrders.add(order.substring(0, order.length() - 1));
         }
         return toppingOrders;
     }
