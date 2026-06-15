@@ -39,12 +39,12 @@ class UIInformation {
 
     public static final Path filePath = Path.of("Star_Grill_info/food_options");
 
-    private static final Map<String, Integer> FOOD = new HashMap<>();
-    private static final Map<String, Integer> DRINK = new HashMap<>();
-    private static final Map<String, Integer> FROZEN = new HashMap<>();
-    private static final Map<String, Integer> TOPPING = new HashMap<>();
-    private static final Map<String, Integer> popUpButton = new HashMap<>();
-    private static final Map<String, Integer> allItems = new HashMap<>();
+    private static final Map<String, Double> FOOD = new HashMap<>();
+    private static final Map<String, Double> DRINK = new HashMap<>();
+    private static final Map<String, Double> FROZEN = new HashMap<>();
+    private static final Map<String, Double> TOPPING = new HashMap<>();
+    private static final Map<String, Double> popUpButton = new HashMap<>();
+    private static final Map<String, Double> allItems = new HashMap<>();
 
     UIInformation() {
         try {
@@ -57,29 +57,30 @@ class UIInformation {
                 int lengthProduct = newLine[0].length();
 
                 char lastChar = newLine[0].charAt(lengthProduct - 1);
+                Double price = Double.parseDouble(newLine[1]);
 
                 if (lastChar == '!') {
-                    FOOD.put(newLine[0], Integer.parseInt(newLine[1]));
+                    FOOD.put(newLine[0], price);
                     foodNumber++;
                 }
                 else if (lastChar == '@') {
-                    DRINK.put(newLine[0], Integer.parseInt(newLine[1]));
+                    DRINK.put(newLine[0], price);
                     drinkNumber++;
                 }
                 else if (lastChar== '#') {
-                    FROZEN.put(newLine[0], Integer.parseInt(newLine[1]));
+                    FROZEN.put(newLine[0], price);
                     frozenNumber++;
                 }
                 else if (lastChar == '$') {
-                    TOPPING.put(newLine[0], Integer.parseInt(newLine[1]));
+                    TOPPING.put(newLine[0], price);
                     toppingNumber++;
                 }
                 else if (lastChar == '%') {
-                    popUpButton.put(newLine[0], Integer.parseInt(newLine[1]));
+                    popUpButton.put(newLine[0], price);
                     popUpButtonNumber++;
                 }
 
-                allItems.put(newLine[0], Integer.parseInt(newLine[1]));
+                allItems.put(newLine[0], price);
                 allItemsNumber ++;
             }
         }
@@ -104,17 +105,17 @@ class UIInformation {
 
     public static int allItemsNumber() { return allItemsNumber; }
 
-    public static Map<String, Integer> food() { return FOOD; }
+    public static Map<String, Double> food() { return FOOD; }
 
-    public static Map<String, Integer> drink() { return DRINK; }
+    public static Map<String, Double> drink() { return DRINK; }
 
-    public static Map<String, Integer> frozen() { return FROZEN; }
+    public static Map<String, Double> frozen() { return FROZEN; }
 
-    public static Map<String, Integer> topping() { return TOPPING; }
+    public static Map<String, Double> topping() { return TOPPING; }
 
-    public static Map<String, Integer> popUpButton() { return popUpButton; }
+    public static Map<String, Double> popUpButton() { return popUpButton; }
 
-    public static Map<String, Integer> allItems() { return allItems; }
+    public static Map<String, Double> allItems() { return allItems; }
 }
 
 abstract class ButtonLayout {
@@ -128,7 +129,7 @@ abstract class ButtonLayout {
 
         int counter = 0;
 
-        Map<String, Integer> items = null;
+        Map<String, Double> items = null;
 
         if (itemCode == '@') {
             items = UIInformation.drink();
@@ -160,7 +161,7 @@ abstract class ButtonLayout {
             productButton.setMinWidth(UIInformation.stageWidth() * buttonWidth);
             productButton.setMaxWidth(UIInformation.stageWidth() * buttonWidth);
 
-            Map<String, Integer> finalItems = items;
+            Map<String, Double> finalItems = items;
 
             productButton.setOnAction(e -> {
                 if (itemCode == '@') {
@@ -542,10 +543,31 @@ class FinalLayout {
         return customAmount;
     }
 
-    private static VBox orderExtraDetails () {
-        VBox orderExtraDetailsVBox = new VBox();
-        orderExtraDetailsVBox.setSpacing(UIInformation.stageHeight() * 0.01);
+    private static int discountGiven = 0;
 
+    private static Button discountButton() {
+        Button discountButton = new Button("Discount 1");
+        discountButton.setOnAction(event -> {
+            if (discountGiven < 3) {
+                Payments.subtractTotal(1.13);
+                updateTotal();
+            }
+            discountGiven++;
+        });
+
+        discountButton.setPrefWidth(UIInformation.stageWidth() * 0.15);
+        discountButton.setPrefHeight(UIInformation.stageHeight() * 0.05);
+
+        discountButton.setStyle("-fx-border-color: black;" +
+                "-fx-font-size: " + UIInformation.stageWidth() * 0.01 + "px;" +
+                "-fx-font-weight: bold;");
+
+        return discountButton;
+    }
+
+    private static int toGoNum = 1;
+
+    private static Button toGoButton() {
         Button toGoButton = new Button();
 
         toGoButton.setPrefWidth(UIInformation.stageWidth() * 0.15);
@@ -556,24 +578,42 @@ class FinalLayout {
                 "-fx-font-size: " + UIInformation.stageWidth() * 0.01 + "px;" +
                 "-fx-font-weight: bold;");
 
-        toGoButton.setOnAction(event -> ExtraDetails.toGo());
+        toGoButton.setOnAction(event -> {
+            ExtraDetails.toGo();
+            if (toGoNum % 2 == 1)
+                toGoButton.setText("To Go Clicked");
+            else
+                toGoButton.setText("To Go");
+            toGoNum++;
+        });
 
+        return toGoButton;
+    }
+
+    private static TextField extraDetails() {
         TextField extraDetails = new TextField();
         extraDetails.setPrefWidth(UIInformation.stageWidth() * 0.15);
         extraDetails.setPrefHeight(UIInformation.stageHeight() * 0.05);
         extraDetails.setPromptText("Extra Details");
 
         extraDetails.setOnAction(event -> {
-           String details = extraDetails.getText();
+            String details = extraDetails.getText();
 
-           if (!details.isEmpty()) {
-               Orders.addOrder(details+'^');
-               UpdateOrdersLayouts updatingLayout = new UpdateOrdersLayouts();
-               updatingLayout.updateOrderLayouts();
-           }
+            if (!details.isEmpty()) {
+                Orders.addOrder("> " + details+'^');
+                UpdateOrdersLayouts updatingLayout = new UpdateOrdersLayouts();
+                updatingLayout.updateOrderLayouts();
+            }
         });
 
-        orderExtraDetailsVBox.getChildren().addAll(extraDetails, toGoButton);
+        return extraDetails;
+    }
+
+    private static VBox orderExtraDetails () {
+        VBox orderExtraDetailsVBox = new VBox();
+        orderExtraDetailsVBox.setSpacing(UIInformation.stageHeight() * 0.01);
+
+        orderExtraDetailsVBox.getChildren().addAll(extraDetails(), toGoButton(), discountButton());
 
         return orderExtraDetailsVBox;
     }
@@ -598,7 +638,7 @@ class FinalLayout {
         }
         else {
             Label changeLabel = new Label(String.valueOf(
-                    collected - Payments.getTotal()));
+                    collected - Double.parseDouble(Payments.getTotal())));
             changeLabel.setTranslateX(UIInformation.stageWidth() * 0.22 * 0.45);
             popupPane.getChildren().add(changeLabel);
         }
@@ -673,8 +713,18 @@ class FinalLayout {
             }
         });
 
-        inputBox.setOnAction(event -> changeFunction(popupPane, Double.parseDouble(inputBox.getText())));
-        submitButton.setOnAction(e -> changeFunction(popupPane, Double.parseDouble(inputBox.getText())));
+        inputBox.setOnAction(event -> {
+            if (!inputBox.getText().isEmpty())
+                changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
+            else
+                mainStackPane.getChildren().remove(popupPane);
+        });
+        submitButton.setOnAction(e -> {
+            if (!inputBox.getText().isEmpty())
+                changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
+            else
+                mainStackPane.getChildren().remove(popupPane);
+        });
 
         popupPane.getChildren().addAll(inputBox, submitButton, messageLabel);
         mainStackPane.getChildren().add(popupPane);
@@ -687,6 +737,8 @@ class FinalLayout {
 
         UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
         updatingLayouta.updateOrderLayouts();
+
+        discountGiven = 0;
     }
 
     private static Button nextAction() {

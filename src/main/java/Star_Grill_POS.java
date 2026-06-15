@@ -165,8 +165,11 @@ class ExtraDetails {
 class Payments {
     private static double total = 0;
 
-    public static double getTotal () {
-        return total;
+    public static String getTotal () {
+        String totalStr = String.valueOf(total);
+        totalStr = totalStr.substring(0,
+                totalStr.indexOf(".") + 3 <= totalStr.length() ? totalStr.indexOf(".") + 3 : totalStr.length());
+        return totalStr;
     }
 
     public static double addTotal (double add) {
