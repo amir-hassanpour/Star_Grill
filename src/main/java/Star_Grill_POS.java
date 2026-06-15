@@ -162,6 +162,10 @@ class ExtraDetails {
     public static void removeExtraDetails() {
         extraDetails = new ArrayList<>();
     }
+
+    public static void removeExtraDetail(String detail) {
+        extraDetails.remove(detail);
+    }
 }
 
 class Payments {

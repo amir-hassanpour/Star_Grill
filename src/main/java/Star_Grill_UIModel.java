@@ -349,6 +349,8 @@ class PaneCreator {
                         Orders.removeOrder(order);
                         Payments.subtractTotal(UIInformation.allItems().get(order));
                         FinalLayout.updateTotal();
+                        if (order.contains(">"))
+                            ExtraDetails.removeExtraDetail(order);
                     }
                 }
                 UpdateOrdersLayouts update = new UpdateOrdersLayouts();
