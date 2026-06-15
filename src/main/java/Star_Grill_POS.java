@@ -220,7 +220,6 @@ class ReceiptPrint {
         }
         catch (Exception e) {
             e.printStackTrace();
-
         }
     }
 }
@@ -235,7 +234,7 @@ class CustomerReceiptPrinter extends ReceiptPrint {
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We’d appreciate your review!");
 
-        printTextFile("Star_Grill_info/CustomerReceiptPrinter");
+        printTextFile("Star_Grill_info/CustomerReceiptPrinter.txt");
     }
 }
 
@@ -256,7 +255,7 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         editor.addLastLines(ExtraDetails.getExtraDetails());
         editor.addLastLine(Time.getHourMinute());
 
-        printTextFile("Star_Grill_info/OrdersReceiptPrinter");
+        printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
     }
 }
 
