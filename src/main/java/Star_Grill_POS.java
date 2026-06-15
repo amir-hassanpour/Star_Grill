@@ -11,6 +11,8 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import java.time.LocalTime;
+import javax.print.*;
+import java.io.ByteArrayOutputStream;
 
 class CustomerNumber {
     public static int customerNumber = 1;
@@ -118,8 +120,12 @@ class Time {
 
         int hour = localTime.getHour();
         int minute = localTime.getMinute();
+        String minutes = String.valueOf(minute);
 
-        return hour + ":" + minute;
+        if (minute < 10)
+            minutes = "0" + minute;
+
+        return hour + ":" + minutes;
     }
 
     public static String getDate() {
@@ -134,7 +140,7 @@ class Time {
 }
 
 class ExtraDetails {
-    private static List<String> extraDetails;
+    private static List<String> extraDetails = new ArrayList<>();
 
     public static void addExtraDetails(String extraDetail) {
         extraDetails.add(extraDetail);
@@ -209,16 +215,39 @@ class ReceiptPrint {
             PrintService printer = PrintServiceLookup.lookupDefaultPrintService();
 
             if (printer == null) {
+                System.out.println("No default printer found.");
                 return;
             }
 
-            byte[] fileBytes = Files.readAllBytes(Path.of(fileName));
-            DocPrintJob job = printer.createPrintJob();
+            Path path = Path.of(fileName);
 
-            Doc doc = new SimpleDoc(fileBytes, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
+            if (!Files.exists(path)) {
+                System.out.println("File does not exist: " + path.toAbsolutePath());
+                return;
+            }
+
+            byte[] fileBytes = Files.readAllBytes(path);
+
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            output.write(new byte[]{0x1B, 0x40});
+
+            output.write(fileBytes);
+
+            output.write(new byte[]{0x1B, 0x64, 0x08});
+
+            output.write(new byte[]{0x1D, 0x56, 0x00});
+
+            byte[] finalBytes = output.toByteArray();
+
+            DocPrintJob job = printer.createPrintJob();
+            Doc doc = new SimpleDoc(finalBytes, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
+
             job.print(doc, null);
-        }
-        catch (Exception e) {
+
+            System.out.println("Print job sent to: " + printer.getName());
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -232,9 +261,8 @@ class CustomerReceiptPrinter extends ReceiptPrint {
         editor.removeAllLines();
 
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
-        editor.addLastLine("We’d appreciate your review!");
 
-        printTextFile("Star_Grill_info/Customer_Receipt.txt");
+        printTextFile("Star_Grill_info/Customer_Receipt");
     }
 }
 
@@ -243,6 +271,8 @@ class OrdersReceiptPrinter extends ReceiptPrint {
     private static StarGrillTextFileEditor editor = new StarGrillTextFileEditor(customerFileNama);
 
     public static void OrdersReceiptPrint() throws IOException {
+        String curTime = Time.getHourMinute();
+
         editor.removeAllLines();
 
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
@@ -253,9 +283,9 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         editor.addLastLines(foodOrders.getOrders());
         editor.addLastLines(drinkOrders.getOrders());
         editor.addLastLines(ExtraDetails.getExtraDetails());
-        editor.addLastLine(Time.getHourMinute());
+        editor.addLastLine(curTime);
 
-        printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/Orders");
     }
 }
 

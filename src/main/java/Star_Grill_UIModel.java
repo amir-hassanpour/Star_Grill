@@ -766,6 +766,7 @@ class FinalLayout {
         cashPay.setOnAction(event -> {
             RecordAllOrders.recordAllOrders("Cash");
             cashHelper();
+            CashDrawerOpener.cashDrawerOpener();
         });
 
         cardPay.setOnAction(event -> {
