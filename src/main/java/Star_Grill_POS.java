@@ -225,7 +225,7 @@ class ReceiptPrint {
 }
 
 class CustomerReceiptPrinter extends ReceiptPrint {
-    private static final String customerFileName = "Star_Grill_info/CustomerReceiptPrinter";
+    private static final String customerFileName = "Star_Grill_info/CustomerReceipt";
     private static final StarGrillTextFileEditor editor = new StarGrillTextFileEditor(customerFileName);
 
     public static void CustomerReceiptPrint() throws IOException {
@@ -234,7 +234,7 @@ class CustomerReceiptPrinter extends ReceiptPrint {
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We’d appreciate your review!");
 
-        printTextFile("Star_Grill_info/CustomerReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/CustomerReceipt.txt");
     }
 }
 
