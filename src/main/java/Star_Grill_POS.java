@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -13,6 +14,7 @@ import javax.print.SimpleDoc;
 import java.time.LocalTime;
 import javax.print.*;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 
 class CustomerNumber {
     public static int customerNumber = 1;
@@ -283,8 +285,32 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         FoodOrders foodOrders = new FoodOrders();
         DrinkOrders drinkOrders = new DrinkOrders();
 
-        editor.addLastLines(foodOrders.getOrders());
-        editor.addLastLines(drinkOrders.getOrders());
+        Map<String, Integer> allOrders = new HashMap<>();
+
+        for (String order : foodOrders.getOrders()) {
+            if (!allOrders.containsKey(order)) {
+                allOrders.put(order, 0);
+                for (String orde : foodOrders.getOrders()) {
+                    if (orde.equals(order))
+                        allOrders.put(order, allOrders.get(order) + 1);
+                }
+            }
+        }
+
+        for (String order : drinkOrders.getOrders()) {
+            if (!allOrders.containsKey(order)) {
+                allOrders.put(order, 0);
+                for (String orde : drinkOrders.getOrders()) {
+                    if (orde.equals(order))
+                        allOrders.put(order, allOrders.get(order) + 1);
+                }
+            }
+        }
+
+        for (String order : allOrders.keySet())
+            editor.addLastLine(order + " X " + allOrders.get(order));
+
+
         editor.addLastLines(ExtraDetails.getExtraDetails());
         editor.addLastLine(curTime);
 

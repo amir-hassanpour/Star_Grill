@@ -600,9 +600,10 @@ class FinalLayout {
             String details = extraDetails.getText();
 
             if (!details.isEmpty()) {
-                Orders.addOrder("> " + details+'^');
+                Orders.addOrder("> " + details + '^');
                 UpdateOrdersLayouts updatingLayout = new UpdateOrdersLayouts();
                 updatingLayout.updateOrderLayouts();
+                ExtraDetails.addExtraDetails("> " + details);
             }
         });
 
