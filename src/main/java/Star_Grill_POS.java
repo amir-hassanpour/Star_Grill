@@ -13,11 +13,7 @@ import javax.print.SimpleDoc;
 import java.time.LocalTime;
 
 class CustomerNumber {
-    public static int customerNumber;
-
-    public static void customerNumberInitializer() {
-        customerNumber = 1;
-    }
+    public static int customerNumber = 1;
 
     public static int nextInt() {
         customerNumber++;
@@ -98,13 +94,14 @@ class ToppingOrders extends Orders {
 }
 
 class RecordAllOrders {
-    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor("Star_Grill_info/Order_History.txt");
+    private static final StarGrillTextFileEditor editor = new StarGrillTextFileEditor(
+            "Star_Grill_info/Order_History");
 
     public static void recordAllOrders(String paymentType) {
         List<String> allOrders = new ArrayList<>();
 
         for (String order: Orders.orders) {
-            allOrders.add(order + " " + Time.getHourMinute() + " " + Time.getDate() + " " + paymentType);
+            allOrders.add(order.substring(0, order.length() - 1) + ", " + Time.getHourMinute() + ", " + Time.getDate() + ", " + paymentType);
         }
 
         editor.addLastLines(allOrders);
@@ -112,6 +109,10 @@ class RecordAllOrders {
 }
 
 class Time {
+    private Time() {
+        /* This utility class should not be instantiated */
+    }
+
     public static String getHourMinute() {
         LocalTime localTime = LocalTime.now();
 
@@ -171,6 +172,10 @@ class Payments {
         total -= sub;
         return total;
     }
+
+    public static void resetTotal() {
+        total = 0;
+    }
 }
 
 class CashDrawerOpener {
@@ -221,8 +226,8 @@ class ReceiptPrint {
 }
 
 class CustomerReceiptPrinter extends ReceiptPrint {
-    private static final String customerFileNama = "Star_Grill_info/CustomerReceiptPrinter.txt";
-    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor(customerFileNama);
+    private static final String customerFileName = "Star_Grill_info/CustomerReceiptPrinter";
+    private static final StarGrillTextFileEditor editor = new StarGrillTextFileEditor(customerFileName);
 
     public static void CustomerReceiptPrint() throws IOException {
         editor.removeAllLines();
@@ -230,13 +235,13 @@ class CustomerReceiptPrinter extends ReceiptPrint {
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We’d appreciate your review!");
 
-        printTextFile("Star_Grill_info/CustomerReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/CustomerReceiptPrinter");
     }
 }
 
 class OrdersReceiptPrinter extends ReceiptPrint {
-    private static final String customerFileNama = "Star_Grill_info/Orders.txt";
-    private static Star_Grill_Text_File_Editor editor = new Star_Grill_Text_File_Editor(customerFileNama);
+    private static final String customerFileNama = "Star_Grill_info/Orders";
+    private static StarGrillTextFileEditor editor = new StarGrillTextFileEditor(customerFileNama);
 
     public static void OrdersReceiptPrint() throws IOException {
         editor.removeAllLines();
@@ -251,7 +256,7 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         editor.addLastLines(ExtraDetails.getExtraDetails());
         editor.addLastLine(Time.getHourMinute());
 
-        printTextFile("Star_Grill_info/OrdersReceiptPrinter.txt");
+        printTextFile("Star_Grill_info/OrdersReceiptPrinter");
     }
 }
 
@@ -261,10 +266,11 @@ class NextReset {
         nextResetOrders.clearOrders();
 
         if (ifTrue)
-            CustomerNumber.customerNumberInitializer();
+            CustomerNumber.customerNumber = 1;
         else
             CustomerNumber.nextInt();
 
         ExtraDetails.removeExtraDetails();
+        Payments.resetTotal();
     }
 }

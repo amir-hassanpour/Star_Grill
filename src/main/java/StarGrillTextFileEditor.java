@@ -6,11 +6,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Star_Grill_Text_File_Editor {
+public class StarGrillTextFileEditor {
     private String fileName;
     private Path path;
 
-    Star_Grill_Text_File_Editor(String fileName) {
+    StarGrillTextFileEditor(String fileName) {
         this.fileName = fileName;
         this.path = Paths.get(fileName);
     }
