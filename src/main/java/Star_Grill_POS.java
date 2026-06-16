@@ -279,7 +279,7 @@ class CustomerReceiptPrinter extends ReceiptPrint {
     public static void CustomerReceiptPrint() throws IOException {
         editor.removeAllLines();
 
-        editor.addLastLine("    Star Grill");
+        editor.addLastLine("        Star Grill");
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We would appreciate your review.");
 
