@@ -637,6 +637,7 @@ class FinalLayout {
     private static void changeFunction(Pane popupPane, double collected) {
         if (cashSubNum % 2 == 0) {
             mainStackPane.getChildren().remove(popupPane);
+            RecordAllOrders.recordAllOrders("Cash");
             nextActionHelper();
         }
         else {
@@ -819,7 +820,6 @@ class FinalLayout {
         Button cardPay = new Button("Card");
 
         cashPay.setOnAction(event -> {
-            RecordAllOrders.recordAllOrders("Cash");
             cashHelper();
             CashDrawerOpener.cashDrawerOpener();
         });
