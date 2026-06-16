@@ -239,12 +239,22 @@ class ReceiptPrint {
 
             ByteArrayOutputStream output = new ByteArrayOutputStream();
 
+            // Reset printer
             output.write(new byte[]{0x1B, 0x40});
 
+            // Make font bigger: double width + double height
+            output.write(new byte[]{0x1D, 0x21, 0x11});
+
+            // Print file contents
             output.write(fileBytes);
 
+            // Return font size to normal
+            output.write(new byte[]{0x1D, 0x21, 0x00});
+
+            // Feed paper
             output.write(new byte[]{0x1B, 0x64, 0x08});
 
+            // Cut paper
             output.write(new byte[]{0x1D, 0x56, 0x00});
 
             byte[] finalBytes = output.toByteArray();
