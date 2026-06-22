@@ -1,12 +1,10 @@
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -14,9 +12,8 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import java.time.LocalTime;
+import java.util.List;
 import javax.print.*;
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
 
 class CustomerNumber {
     public static int customerNumber = 1;
@@ -223,29 +220,40 @@ class CashDrawerOpener {
 class ReceiptPrint {
     public static void printTextFile(String fileName) {
         try {
-            File file = new File(fileName);
-
-            if (!file.exists()) {
-                System.out.println("File does not exist: " + file.getAbsolutePath());
+            PrintService printer = PrintServiceLookup.lookupDefaultPrintService();
+            if (printer == null) {
+                System.out.println("No default printer found.");
                 return;
             }
-
-            if (!Desktop.isDesktopSupported()) {
-                System.out.println("Desktop printing is not supported.");
+            Path path = Path.of(fileName);
+            if (!Files.exists(path)) {
+                System.out.println("File does not exist: " + path.toAbsolutePath());
                 return;
             }
-
-            Desktop desktop = Desktop.getDesktop();
-
-            if (!desktop.isSupported(Desktop.Action.PRINT)) {
-                System.out.println("Print action is not supported.");
-                return;
+            byte[] resetPrinter = new byte[]{0x1B, 0x40};
+            ByteArrayOutputStream endingCommands = new ByteArrayOutputStream();
+            // Add some space before cutting
+            endingCommands.write("\n\n".getBytes(StandardCharsets.US_ASCII));
+            // Feed paper
+            endingCommands.write(new byte[]{0x1B, 0x64, 0x08});
+            // Cut paper
+            endingCommands.write(new byte[]{0x1D, 0x56, 0x00});
+            InputStream resetStream = new ByteArrayInputStream(resetPrinter);
+            InputStream fileStream = Files.newInputStream(path);
+            InputStream endingStream = new ByteArrayInputStream(endingCommands.toByteArray());
+            Enumeration<InputStream> streams = Collections.enumeration(
+                    Arrays.asList(resetStream, fileStream, endingStream)
+            );
+            try (InputStream finalStream = new SequenceInputStream(streams)) {
+                DocPrintJob job = printer.createPrintJob();
+                Doc doc = new SimpleDoc(
+                        finalStream,
+                        DocFlavor.INPUT_STREAM.AUTOSENSE,
+                        null
+                );
+                job.print(doc, null);
             }
-
-            desktop.print(file);
-
-            System.out.println("Asked the operating system to print: " + file.getAbsolutePath());
-
+            System.out.println("Print job sent to: " + printer.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
