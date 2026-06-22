@@ -271,7 +271,7 @@ class CustomerReceiptPrinter extends ReceiptPrint {
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We would appreciate your review.");
 
-        printTextFile("Star_Grill_info/Customer_Receipt");
+        printTextFile("Star_Grill_info/Customer_Receipt.txt");
     }
 }
 
@@ -318,7 +318,7 @@ class OrdersReceiptPrinter extends ReceiptPrint {
         editor.addLastLines(ExtraDetails.getExtraDetails());
         editor.addLastLine(curTime);
 
-        printTextFile("Star_Grill_info/Orders");
+        printTextFile("Star_Grill_info/Orders.txt");
     }
 }
 
