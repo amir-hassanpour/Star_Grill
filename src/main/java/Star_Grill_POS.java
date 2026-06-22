@@ -220,40 +220,17 @@ class CashDrawerOpener {
 class ReceiptPrint {
     public static void printTextFile(String fileName) {
         try {
-            PrintService printer = PrintServiceLookup.lookupDefaultPrintService();
-            if (printer == null) {
-                System.out.println("No default printer found.");
+            File file = new File(fileName);
+            if (!file.exists()) {
+                System.out.println("File does not exist: " + file.getAbsolutePath());
                 return;
             }
-            Path path = Path.of(fileName);
-            if (!Files.exists(path)) {
-                System.out.println("File does not exist: " + path.toAbsolutePath());
+            if (!file.getName().toLowerCase().endsWith(".txt")) {
+                System.out.println("File must end with .txt for Windows app printing.");
                 return;
             }
-            byte[] resetPrinter = new byte[]{0x1B, 0x40};
-            ByteArrayOutputStream endingCommands = new ByteArrayOutputStream();
-            // Add some space before cutting
-            endingCommands.write("\n\n".getBytes(StandardCharsets.US_ASCII));
-            // Feed paper
-            endingCommands.write(new byte[]{0x1B, 0x64, 0x08});
-            // Cut paper
-            endingCommands.write(new byte[]{0x1D, 0x56, 0x00});
-            InputStream resetStream = new ByteArrayInputStream(resetPrinter);
-            InputStream fileStream = Files.newInputStream(path);
-            InputStream endingStream = new ByteArrayInputStream(endingCommands.toByteArray());
-            Enumeration<InputStream> streams = Collections.enumeration(
-                    Arrays.asList(resetStream, fileStream, endingStream)
-            );
-            try (InputStream finalStream = new SequenceInputStream(streams)) {
-                DocPrintJob job = printer.createPrintJob();
-                Doc doc = new SimpleDoc(
-                        finalStream,
-                        DocFlavor.INPUT_STREAM.AUTOSENSE,
-                        null
-                );
-                job.print(doc, null);
-            }
-            System.out.println("Print job sent to: " + printer.getName());
+            Desktop.getDesktop().print(file);
+            System.out.println("Asked Windows to print: " + file.getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -267,7 +244,6 @@ class CustomerReceiptPrinter extends ReceiptPrint {
     public static void CustomerReceiptPrint() throws IOException {
         editor.removeAllLines();
 
-        editor.addLastLine("      Star Grill");
         editor.addLastLine("Order Number: " + CustomerNumber.customerNumber);
         editor.addLastLine("We would appreciate your review.");
 
