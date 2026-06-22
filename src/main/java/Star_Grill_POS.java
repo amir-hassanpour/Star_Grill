@@ -1,3 +1,5 @@
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -221,50 +223,28 @@ class CashDrawerOpener {
 class ReceiptPrint {
     public static void printTextFile(String fileName) {
         try {
-            PrintService printer = PrintServiceLookup.lookupDefaultPrintService();
+            File file = new File(fileName);
 
-            if (printer == null) {
-                System.out.println("No default printer found.");
+            if (!file.exists()) {
+                System.out.println("File does not exist: " + file.getAbsolutePath());
                 return;
             }
 
-            Path path = Path.of(fileName);
-
-            if (!Files.exists(path)) {
-                System.out.println("File does not exist: " + path.toAbsolutePath());
+            if (!Desktop.isDesktopSupported()) {
+                System.out.println("Desktop printing is not supported.");
                 return;
             }
 
-            byte[] fileBytes = Files.readAllBytes(path);
+            Desktop desktop = Desktop.getDesktop();
 
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            if (!desktop.isSupported(Desktop.Action.PRINT)) {
+                System.out.println("Print action is not supported.");
+                return;
+            }
 
-            // Reset printer
-            output.write(new byte[]{0x1B, 0x40});
+            desktop.print(file);
 
-            // Make font bigger: double width + double height
-            output.write(new byte[]{0x1D, 0x21, 0x11});
-
-            // Print file contents
-            output.write(fileBytes);
-
-            // Return font size to normal
-            output.write(new byte[]{0x1D, 0x21, 0x00});
-
-            // Feed paper
-            output.write(new byte[]{0x1B, 0x64, 0x08});
-
-            // Cut paper
-            output.write(new byte[]{0x1D, 0x56, 0x00});
-
-            byte[] finalBytes = output.toByteArray();
-
-            DocPrintJob job = printer.createPrintJob();
-            Doc doc = new SimpleDoc(finalBytes, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
-
-            job.print(doc, null);
-
-            System.out.println("Print job sent to: " + printer.getName());
+            System.out.println("Asked the operating system to print: " + file.getAbsolutePath());
 
         } catch (Exception e) {
             e.printStackTrace();

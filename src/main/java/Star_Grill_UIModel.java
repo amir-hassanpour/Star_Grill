@@ -641,8 +641,10 @@ class FinalLayout {
             nextActionHelper();
         }
         else {
-            Label changeLabel = new Label(String.valueOf(
-                    collected - Double.parseDouble(Payments.getTotal())));
+            String giveBack = String.valueOf(
+                    Math.ceil((collected - Double.parseDouble(Payments.getTotal())) * 100) / 100);
+
+            Label changeLabel = new Label(giveBack);
             changeLabel.setTranslateX(UIInformation.stageWidth() * 0.22 * 0.45);
             popupPane.getChildren().add(changeLabel);
         }
@@ -720,14 +722,20 @@ class FinalLayout {
         inputBox.setOnAction(event -> {
             if (!inputBox.getText().isEmpty())
                 changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
-            else
+            else {
                 mainStackPane.getChildren().remove(popupPane);
+                RecordAllOrders.recordAllOrders("Cash");
+                nextActionHelper();
+            }
         });
         submitButton.setOnAction(e -> {
             if (!inputBox.getText().isEmpty())
                 changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
-            else
+            else {
                 mainStackPane.getChildren().remove(popupPane);
+                RecordAllOrders.recordAllOrders("Cash");
+                nextActionHelper();
+            }
         });
 
         popupPane.getChildren().addAll(inputBox, submitButton, messageLabel);
@@ -817,7 +825,7 @@ class FinalLayout {
         HBox paymentMethodHBox = new HBox();
 
         Button cashPay = new Button("Cash");
-        Button cardPay = new Button("Card");
+        Button cardPay = new Button("Paid");
 
         cashPay.setOnAction(event -> {
             cashHelper();
