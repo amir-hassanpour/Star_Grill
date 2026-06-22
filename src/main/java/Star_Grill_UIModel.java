@@ -37,7 +37,7 @@ class UIInformation {
     private static final double STAGE_WIDTH = screenBounds.getWidth();
     private static final double STAGE_HEIGHT = screenBounds.getHeight();
 
-    public static final Path filePath = Path.of("Star_Grill_info/food_options");
+    public static final Path filePath = Path.of("Star_Grill_info/food_options.txt");
 
     private static final Map<String, Double> FOOD = new HashMap<>();
     private static final Map<String, Double> DRINK = new HashMap<>();
