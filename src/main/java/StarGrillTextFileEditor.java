@@ -12,7 +12,7 @@ public class StarGrillTextFileEditor {
 
     StarGrillTextFileEditor(String fileName) {
         this.fileName = fileName + ".txt";
-        this.path = Paths.get(fileName);
+        this.path = Paths.get(this.fileName);
     }
 
     public void addLastLine(String lineAdd) {
