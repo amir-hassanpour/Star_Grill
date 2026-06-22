@@ -11,7 +11,7 @@ public class StarGrillTextFileEditor {
     private Path path;
 
     StarGrillTextFileEditor(String fileName) {
-        this.fileName = fileName;
+        this.fileName = fileName + ".txt";
         this.path = Paths.get(fileName);
     }
 
