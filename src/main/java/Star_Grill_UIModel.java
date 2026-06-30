@@ -566,12 +566,15 @@ class FinalLayout {
 
         return discountButton;
     }
-
+    private static final Button toGoButton = new Button();
     private static int toGoNum = 1;
 
-    private static Button toGoButton() {
-        Button toGoButton = new Button();
+    public static void toGoReset() {
+        toGoNum = 1;
+        toGoButton.setText("To Go");
+    }
 
+    private static Button toGoButton() {
         toGoButton.setPrefWidth(UIInformation.stageWidth() * 0.15);
         toGoButton.setPrefHeight(UIInformation.stageHeight() * 0.05);
         toGoButton.setText("To Go");
@@ -652,6 +655,10 @@ class FinalLayout {
     }
 
     private static int cashSubNum = 1;
+
+    public static void cashSubNumReset() {
+        cashSubNum = 1;
+    }
 
     private static void cashHelper() {
         double stageW = UIInformation.stageWidth();
