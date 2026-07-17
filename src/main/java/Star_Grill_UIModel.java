@@ -734,8 +734,6 @@ class FinalLayout {
 
         UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
         updatingLayouta.updateOrderLayouts();
-
-        discountGiven = 0;
     }
 
     private static Button paidAction() {
