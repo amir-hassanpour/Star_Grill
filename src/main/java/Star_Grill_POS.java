@@ -170,11 +170,9 @@ class ExtraDetails {
 class Payments {
     private static double total = 0;
 
-    public static String getTotal () {
-        String totalStr = String.valueOf(total);
-        totalStr = totalStr.substring(0,
-                totalStr.indexOf(".") + 3 <= totalStr.length() ? totalStr.indexOf(".") + 3 : totalStr.length());
-        return totalStr;
+    public static String getTotal() {
+        double roundedDown = Math.floor(total * 100) / 100.0;
+        return String.format("%.2f", roundedDown);
     }
 
     public static double addTotal (double add) {
@@ -184,6 +182,10 @@ class Payments {
 
     public static double subtractTotal(double sub) {
         total -= sub;
+
+        if (total < 0)
+            total = 0;
+
         return total;
     }
 
