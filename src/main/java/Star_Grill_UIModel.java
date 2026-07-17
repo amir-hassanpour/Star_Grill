@@ -541,6 +541,7 @@ class FinalLayout {
                UpdateOrdersLayouts updatingLayouta = new UpdateOrdersLayouts();
                updatingLayouta.updateOrderLayouts();
            }
+           customAmount.clear();
         });
         return customAmount;
     }
@@ -610,6 +611,7 @@ class FinalLayout {
                 updatingLayout.updateOrderLayouts();
                 ExtraDetails.addExtraDetails("> " + details);
             }
+            extraDetails.clear();
         });
 
         return extraDetails;
@@ -650,8 +652,8 @@ class FinalLayout {
             Label changeLabel = new Label(giveBack);
             changeLabel.setTranslateX(UIInformation.stageWidth() * 0.22 * 0.45);
             popupPane.getChildren().add(changeLabel);
+            cashSubNum++;
         }
-        cashSubNum++;
     }
 
     private static int cashSubNum = 1;
