@@ -546,16 +546,12 @@ class FinalLayout {
         return customAmount;
     }
 
-    private static int discountGiven = 0;
 
     private static Button discountButton() {
         Button discountButton = new Button("Discount 1");
         discountButton.setOnAction(event -> {
-            if (discountGiven < 3) {
-                Payments.subtractTotal(1.13);
-                updateTotal();
-            }
-            discountGiven++;
+            Payments.subtractTotal(1.13);
+            updateTotal();
         });
 
         discountButton.setPrefWidth(UIInformation.stageWidth() * 0.15);
