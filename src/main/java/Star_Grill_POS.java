@@ -312,7 +312,6 @@ class NextReset {
 
         ExtraDetails.removeExtraDetails();
         Payments.resetTotal();
-        FinalLayout.cashSubNumReset();
         FinalLayout.toGoReset();
     }
 }

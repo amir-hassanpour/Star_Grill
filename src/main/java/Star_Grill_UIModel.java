@@ -639,27 +639,17 @@ class FinalLayout {
         return extraDetail;
     }
 
+    private final static Label changeLabel = new Label();
+
     private static void changeFunction(Pane popupPane, double collected) {
-        if (cashSubNum % 2 == 0) {
-            mainStackPane.getChildren().remove(popupPane);
-            RecordAllOrders.recordAllOrders("Cash");
-            nextActionHelper();
-        }
-        else {
-            String giveBack = String.valueOf(
-                    Math.ceil((collected - Double.parseDouble(Payments.getTotal())) * 100) / 100);
+        String giveBack = String.valueOf(
+                Math.ceil((collected - Double.parseDouble(Payments.getTotal())) * 100) / 100);
 
-            Label changeLabel = new Label(giveBack);
-            changeLabel.setTranslateX(UIInformation.stageWidth() * 0.22 * 0.45);
+        changeLabel.setText(giveBack);
+        changeLabel.setTranslateX(UIInformation.stageWidth() * 0.22 * 0.45);
+
+        if (!popupPane.getChildren().contains(changeLabel))
             popupPane.getChildren().add(changeLabel);
-            cashSubNum++;
-        }
-    }
-
-    private static int cashSubNum = 1;
-
-    public static void cashSubNumReset() {
-        cashSubNum = 1;
     }
 
     private static void cashHelper() {
@@ -731,20 +721,10 @@ class FinalLayout {
         inputBox.setOnAction(event -> {
             if (!inputBox.getText().isEmpty())
                 changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
-            else {
-                mainStackPane.getChildren().remove(popupPane);
-                RecordAllOrders.recordAllOrders("Cash");
-                nextActionHelper();
-            }
         });
         submitButton.setOnAction(e -> {
             if (!inputBox.getText().isEmpty())
                 changeFunction(popupPane, Double.parseDouble(inputBox.getText()));
-            else {
-                mainStackPane.getChildren().remove(popupPane);
-                RecordAllOrders.recordAllOrders("Cash");
-                nextActionHelper();
-            }
         });
 
         popupPane.getChildren().addAll(inputBox, submitButton, messageLabel);
