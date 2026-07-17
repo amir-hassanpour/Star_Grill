@@ -742,15 +742,19 @@ class FinalLayout {
         discountGiven = 0;
     }
 
-    private static Button nextAction() {
-        Button next = new Button("Next");
-        next.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.015));
-        next.setPrefWidth(UIInformation.stageWidth() * 0.1);
-        next.setPrefHeight(UIInformation.stageHeight() * 0.05);
+    private static Button paidAction() {
+        Button paid = new Button("Paid");
 
-        next.setOnAction(e -> nextActionHelper());
+        paid.setOnAction(event -> {
+            RecordAllOrders.recordAllOrders("Card");
+            nextActionHelper();
+        });
 
-        return next;
+        paid.setFont(Font.font("Arial", UIInformation.stageWidth() * 0.012));
+        paid.setPrefWidth(UIInformation.stageWidth() * 0.1);
+        paid.setMaxHeight(UIInformation.stageHeight() * 0.05);
+
+        return paid;
     }
 
     private static Button resetAction() {
@@ -803,7 +807,7 @@ class FinalLayout {
         HBox finalization = new HBox();
         finalization.setSpacing(UIInformation.stageHeight() * 0.02);
 
-        finalization.getChildren().addAll(exitAction(), resetAction(), nextAction(), printAction());
+        finalization.getChildren().addAll(exitAction(), resetAction(), paidAction(), printAction());
 
         finalization.setAlignment(Pos.CENTER);
 
@@ -814,28 +818,18 @@ class FinalLayout {
         HBox paymentMethodHBox = new HBox();
 
         Button cashPay = new Button("Cash");
-        Button cardPay = new Button("Paid");
 
         cashPay.setOnAction(event -> {
             cashHelper();
             CashDrawerOpener.cashDrawerOpener();
         });
 
-        cardPay.setOnAction(event -> {
-            RecordAllOrders.recordAllOrders("Card");
-            nextActionHelper();
-        });
+        paymentMethodHBox.getChildren().addAll(cashPay);
 
-        paymentMethodHBox.getChildren().addAll(cashPay, cardPay);
-
-        cashPay.setPrefWidth(UIInformation.stageWidth() * 0.075);
+        cashPay.setPrefWidth(UIInformation.stageWidth() * 0.15);
         cashPay.setPrefHeight(UIInformation.stageHeight() * 0.05);
 
-        cardPay.setPrefWidth(UIInformation.stageWidth() * 0.075);
-        cardPay.setPrefHeight(UIInformation.stageHeight() * 0.05);
-
         cashPay.setStyle("-fx-border-color: black;");
-        cardPay.setStyle("-fx-border-color: black;");
 
         return paymentMethodHBox;
     }
